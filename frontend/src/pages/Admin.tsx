@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import PendingPapers from "../components/PendingPaperCard";
-import PendingQueries from "../components/PendingQueries";
+// import PendingQueries from "../components/PendingQueries";
 import SideComponent from "../components/SideComponent";
+import AdminResponses from "./AdminResponse";
 
 function Admin() {
   const [activeSection, setActiveSection] = useState("Pending papers");
@@ -11,7 +12,7 @@ function Admin() {
       case "Pending papers":
         return <PendingPapers />;
       case "Pending Queries":
-        return <PendingQueries />;
+        return <AdminResponses />;
       case "See all the papers":
         return (
           <div className="text-xl text-yellow-300">All Papers list will show here...</div>

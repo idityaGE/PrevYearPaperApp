@@ -8,6 +8,8 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import PaperCard from "../components/PaperCard";
 import SelectButton from "../components/SelectButton";
+import MessageIcon from "../components/MessageIcon";
+import AdminResponse from "./AdminResponse";
 
 export default function DashBoard() {
   const [selectedDept, setSelectedDept] = useState<string>("");
@@ -16,7 +18,8 @@ export default function DashBoard() {
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
   const [selectedExamType, setSelectedExamType] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-
+  const userId = 32; // example user ID
+  const [openMessages, setOpenMessages] = useState(false);
   const [papers, setPapers] = useState<any[]>([]); // ✅ store papers here
 
   const departments = universityData.map((d) => d.department);
@@ -169,7 +172,8 @@ export default function DashBoard() {
           />
         ) : null)}
       </div>
-
+          {/* <MessageIcon userId={userId} onClick={() => setOpenMessages(!openMessages)} />
+          {openMessages && <AdminResponse />} */}
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

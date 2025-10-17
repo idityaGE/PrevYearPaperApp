@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useEffect } from "react";
 
 const demoQueries = [
   {
@@ -20,19 +22,39 @@ const demoQueries = [
   },
 ];
 
+// type Query = {
+//   id: number;
+//   email: string;
+//   query: string;
+//   status: string;
+// };
+
+import { useState } from "react";
+
 function PendingQueries() {
+
+  const [allQueries, setAllQueries] = useState<any[]>([]);
+
+  useEffect(()=>{
+    const fetchQueries = async () => {
+      const response = await axios.get("http://localhost:3000/api/admin/queries");
+      setAllQueries(response.data);
+    };
+    fetchQueries();
+  }, []);
+
   return (
     <div className="text-white">
       <h3 className="text-2xl font-semibold mb-8">Pending Queries</h3>
 
       <div className="space-y-6">
-        {demoQueries.map((q) => (
+        {allQueries.map((q) => (
           <div
             key={q.id}
             className="border border-gray-500/50 rounded-2xl p-6 bg-black/30 backdrop-blur-md hover:border-yellow-400 transition-all"
           >
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-lg font-medium">Email - {q.email}</h4>
+              <h4 className="text-lg font-medium">Email - {q.user.email}</h4>
               <span
                 className={`text-sm px-3 py-1 rounded-full ${
                   q.status === "Pending"
@@ -40,13 +62,29 @@ function PendingQueries() {
                     : "bg-green-500/20 text-green-400 border border-green-400/40"
                 }`}
               >
-                {q.status}
+                {q.isResponded ? "Resolved" : "Pending"}
               </span>
             </div>
 
-            <p className="text-gray-300 mb-5 text-base">{q.query}</p>
+            <p className="text-gray-300 mb-5 text-base">{q.message}</p>
 
             <button
+              onClick={async()=>{
+                await axios.put(`http://localhost:3000/api/admin/resolve-query/${q.id}`,{},{
+                  headers:{
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                  }
+                });
+                const updatedQueries = allQueries.map((query) => {
+                  if (query.id === q.id) {
+                    return { ...query, isResponded: true };
+                  }
+                  return query;
+                });
+                setAllQueries(updatedQueries);
+              }}
+              disabled={q.isResponded}
+
               className="border border-white/50 hover:bg-yellow-400 hover:text-black font-semibold text-sm px-4 py-2 rounded-md transition-all"
             >
               Response

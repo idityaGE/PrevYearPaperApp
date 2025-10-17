@@ -8,6 +8,7 @@ import Features from "./pages/Features"
 import AboutUs from "./pages/AboutUs"
 import AddPaper from "./pages/AddPaper"
 import Admin from "./pages/Admin"
+import AdminResponse from "./pages/AdminResponse"
 // import Admin from "./pages/Admin"
 
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/add-paper" element={token ? <AddPaper/> : <SigninPage/>}/>
         <Route path="/admin" element={<Admin/>}/>
+        {/* <Route path="/admin-response" element={<AdminResponse/>}/> */}
       </Routes>
     </BrowserRouter>
   )
