@@ -78,5 +78,52 @@ adminRouter.put('/paper/:id', async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+adminRouter.get('/queries', async (req, res) => {
+    try {
+        const queries = await client.query.findMany({
+            where: {
+                isResponded: false
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+        return res.json(queries);
+    }
+    catch (error) {
+        console.error("Error fetching queries:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+adminRouter.put('/resolve-query/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await client.query.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                response: req.body.response,
+                isResponded: true
+            }
+        });
+        return res.json({
+            message: "Query resolved"
+        });
+    }
+    catch (error) {
+        console.error("Error resolving query:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 export default adminRouter;
 //# sourceMappingURL=adminRoute.js.map

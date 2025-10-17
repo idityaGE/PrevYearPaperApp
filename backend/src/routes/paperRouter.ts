@@ -194,8 +194,52 @@ paperRouter.post("/add-paper",userMiddleware, upload.single("file"), async (req,
 
 
 //delete a paper
+const queryValidation = zod.object({
+    message: zod.string().nonempty("Message cannot be empty").max(1000,"Message too long"),
+    userId: zod.number().optional()
+})
+ 
+paperRouter.post('/contact',userMiddleware,async(req,res)=>{
+    const { message } = req.body;
+    const { id } = req.user as any;
 
+    //store this message in the database with the user id
+    
+    const validation = queryValidation.safeParse({message,userId: id ? Number(id) : undefined});
+    if(!validation.success){
+        return res.status(400).json({ errors: validation.error.flatten().fieldErrors });
+    }
 
+    await client.query.create({
+        data:{
+            message,
+            userId: Number(id)
+        }
+    }).then((query)=>{
+        res.status(201).json({ query });
+    }).catch((err)=>{
+        console.error("Error creating query:", err);
+        res.status(500).json({ error: "Internal server error" });
+    });
+
+})
+
+// Example: queryRoutes.js
+paperRouter.get('/queries/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const queries = await client.query.findMany({
+      where: { userId: parseInt(userId) },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(queries);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching queries' });
+  }
+});
+
+   
 
 export default paperRouter;
 

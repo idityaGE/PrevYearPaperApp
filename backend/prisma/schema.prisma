@@ -69,6 +69,7 @@ enum PaperType {
   CIA_II
 }
 
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -78,18 +79,33 @@ model User {
   papers    Paper[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Relations
+  queries   Query[]    // User who asked the queries
+  responses Query[]    @relation("AdminResponses") // Admin responses to user queries
 }
+
 
 enum Role {
   USER
   ADMIN
 }
 
-
 model Query {
   id           Int      @id @default(autoincrement())
   message      String
   userId       Int?
+  user         User?    @relation(fields: [userId], references: [id])
+
+  response     String?        // Admin's reply (nullable until replied)
+  respondedAt  DateTime?      // When the admin responded
+  adminId      Int?           // Admin who responded
+  admin        User?          @relation("AdminResponses", fields: [adminId], references: [id])
+
   isResponded  Boolean  @default(false)
   createdAt    DateTime @default(now())
 }
+
+
+
+
