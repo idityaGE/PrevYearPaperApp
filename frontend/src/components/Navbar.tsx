@@ -42,10 +42,14 @@ function Navbar() {
           {/* ✅ Login / Logout Button */}
           <button
             onClick={handleAuthClick}
-            className="ml-4 px-5 py-2 bg-white text-amber-600 rounded-full shadow-md font-semibold hover:bg-yellow-50 hover:shadow-lg transition-all duration-300"
+            className="ml-4 px-5 py-2 bg-white text-amber-600 rounded-full shadow-md font-semibold hover:cursor-pointer hover:bg-yellow-50 hover:shadow-lg transition-all duration-300"
           >
             {localStorage.getItem("token") ? "Logout" : "Login"}
           </button>
+
+          <Link to={'/profile'}>
+            <img className="rounded-full bg-white text-orange-500 text-2xl h-13 w-13 text-center flex items-center justify-center shadow-md font-bold hover:cursor-pointer hover:shadow-lg transition-all duration-300" src="user.jpeg" alt="" />
+          </Link>
 
           <ToastContainerComponent />
         </div>

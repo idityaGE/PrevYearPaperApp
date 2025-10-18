@@ -9,6 +9,7 @@ import AboutUs from "./pages/AboutUs"
 import AddPaper from "./pages/AddPaper"
 import Admin from "./pages/Admin"
 import AdminResponse from "./pages/AdminResponse"
+import ProfilePage from "./pages/ProfilePage"
 // import Admin from "./pages/Admin"
 
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/add-paper" element={token ? <AddPaper/> : <SigninPage/>}/>
         <Route path="/admin" element={<Admin/>}/>
+        <Route path="/profile" element={token ? <ProfilePage/> : <SigninPage/>}/>
         {/* <Route path="/admin-response" element={<AdminResponse/>}/> */}
       </Routes>
     </BrowserRouter>
