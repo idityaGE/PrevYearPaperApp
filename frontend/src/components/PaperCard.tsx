@@ -8,14 +8,17 @@ type PaperCardProps = {
 function PaperCard({ title, description }: PaperCardProps) {
   return (
     <div
-      className="h-150 w-120 bg-white m-4 rounded-lg shadow-md 
+      className="w-full max-w-[320px] bg-white rounded-xl shadow-md 
                  hover:shadow-2xl hover:scale-105 hover:-translate-y-2 
-                 transition-all duration-300 cursor-pointer transform"
+                 transition-transform duration-300 cursor-pointer flex flex-col"
     >
-      <h2 className="text-lg font-bold p-4 text-gray-800">{title}</h2>
-      <p className="p-4 text-gray-600">{description}</p>
+      <div className="p-4">
+        <h2 className="text-lg font-bold text-gray-800 line-clamp-2">{title}</h2>
+        <p className="mt-2 text-gray-600 text-sm line-clamp-3">{description}</p>
+      </div>
     </div>
   );
 }
+
 
 export default React.memo(PaperCard);

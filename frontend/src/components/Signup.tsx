@@ -57,23 +57,26 @@ export default function Signup(/*props*/) {
         {/* <div className="h-screen w-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 flex justify-center items-center"> */}
     <Sheet
       sx={{
-        width: 350,
-        mx: 'auto',
+        width: "100%",
+        maxWidth: 380,
+        mx: "auto",
         my: 4,
         py: 3,
-        px: 2,
-        display: 'flex',
-        flexDirection: 'column',
+        px: { xs: 2, sm: 3 },
+        display: "flex",
+        flexDirection: "column",
         gap: 2,
-        borderRadius: '16px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-        color: 'white',
-        background: 'linear-gradient(135deg, rgba(186,186,186,0.6), rgba(99, 106, 125,0.9))',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.2)',
+        borderRadius: "16px",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+        color: "white",
+        background:
+          "linear-gradient(135deg, rgba(186,186,186,0.6), rgba(99, 106, 125,0.9))",
+        backdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.2)",
       }}
       variant="outlined"
->
+    >
+
           <div>
             <Typography level="h4" component="h1">
               <b>Welcome!</b>

@@ -99,14 +99,19 @@ const handleSubjectChange = useCallback((_:any, val:any)  => {
   return (
     <div className="bg-gradient-to-r from-gray-600 to-black via-gray-800 min-h-screen w-full p-5">
       {/* 📌 Selection Filters */}
-      <div className="flex flex-wrap gap-15">
+     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center mb-8">
+
         {/* Department */}
         <Select
           placeholder="Select Department"
           value={selectedDept || null}
           onChange={handleDeptChange}
           indicator={<KeyboardArrowDown />}
-          sx={{ width: 240 }}
+          sx={{
+            width: "100%",
+            minWidth: 180,
+            maxWidth: 250,
+          }}
         >
           {departments.map((dept) => (
             <Option key={dept} value={dept}>
@@ -121,7 +126,12 @@ const handleSubjectChange = useCallback((_:any, val:any)  => {
           value={selectedProgram || null}
           onChange={handleProgramChange}
           indicator={<KeyboardArrowDown />}
-          sx={{ width: 240 }}
+          sx={{
+          width: "100%",
+          minWidth: 180,
+          maxWidth: 250,
+        }}
+
           disabled={!selectedDept}
           title={!selectedDept ? "Please select department first" : ""}
         >
@@ -138,7 +148,11 @@ const handleSubjectChange = useCallback((_:any, val:any)  => {
           value={selectedSubject || null}
           onChange={handleSubjectChange}
           indicator={<KeyboardArrowDown />}
-          sx={{ width: 240 }}
+          sx={{
+            width: "100%",
+            minWidth: 180,
+            maxWidth: 250,
+          }}
           disabled={!selectedProgram}
         >
           {subjects.map((subj) => (
@@ -204,7 +218,8 @@ const handleSubjectChange = useCallback((_:any, val:any)  => {
       </div>
 
       {/* 📚 Papers List */}
-      <div className=" pl-10 mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+   <div className="px-4 mt-10 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
+
         {papers.map((paper, index) => paper.isVerified ? (
           <Suspense fallback={<div>Loading...</div>} key={index}>
             <PaperCard
