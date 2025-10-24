@@ -1,26 +1,26 @@
 import axios from "axios";
 import { useEffect } from "react";
 
-const demoQueries = [
-  {
-    id: 1,
-    email: "rahul@gmail.com",
-    query: "I cannot upload the paper file, it says 'file too large'.",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    email: "sneha@outlook.com",
-    query: "The subject dropdown is not showing for 3rd semester.",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    email: "amit@gmail.com",
-    query: "Can you add previous year papers for Data Science course?",
-    status: "Resolved",
-  },
-];
+// const demoQueries = [
+//   {
+//     id: 1,
+//     email: "rahul@gmail.com",
+//     query: "I cannot upload the paper file, it says 'file too large'.",
+//     status: "Pending",
+//   },
+//   {
+//     id: 2,
+//     email: "sneha@outlook.com",
+//     query: "The subject dropdown is not showing for 3rd semester.",
+//     status: "Pending",
+//   },
+//   {
+//     id: 3,
+//     email: "amit@gmail.com",
+//     query: "Can you add previous year papers for Data Science course?",
+//     status: "Resolved",
+//   },
+// ];
 
 // type Query = {
 //   id: number;

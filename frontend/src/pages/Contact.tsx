@@ -1,6 +1,6 @@
 // import React from "react";
 import axios from "axios";
-import React, { useState } from "react";
+import  { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -48,7 +48,7 @@ function Contact() {
                 headers: {
                   Authorization: `Bearer ${token}`
                 }
-              }).then((res)=>{
+              }).then(()=>{
                 toast.success("Message sent successfully!");
               }).catch((err)=>{
                 console.error(err);

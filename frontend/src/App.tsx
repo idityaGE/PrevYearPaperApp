@@ -8,7 +8,7 @@ import Features from "./pages/Features"
 import AboutUs from "./pages/AboutUs"
 import AddPaper from "./pages/AddPaper"
 import Admin from "./pages/Admin"
-import AdminResponse from "./pages/AdminResponse"
+// import AdminResponse from "./pages/AdminResponse"
 import ProfilePage from "./pages/ProfilePage"
 // import Admin from "./pages/Admin"
 

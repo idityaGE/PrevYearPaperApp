@@ -239,7 +239,83 @@ paperRouter.get('/queries/:userId', async (req, res) => {
   }
 });
 
+
+const updateProfileSchema = zod.object({
+  name: zod.string().min(2).max(100).optional(),
+  bio: zod.string().max(500).optional(),
+  profilePicUrl: zod.string().url().optional(),
+  linkedIn: zod.string().url().optional(),
+  twitter: zod.string().url().optional(),
+});
+
+
+paperRouter.put(
+  "/updateProfile",
+  userMiddleware,
+  upload.single("profilePic"), // 'profilePic' must match your frontend field name
+  async (req, res) => {
+    const { name, bio, linkedIn, twitter } = req.body;
+    let profilePicUrl;
+
+    if (req.file) {
+      // Upload to cloudinary
+      const uploadResult = await cloudinary.uploader.upload_stream(
+        { folder: "profile_pictures" },
+        (error, result) => {
+          if (error) return res.status(500).json({ error: "Cloudinary upload failed" });
+          profilePicUrl = result?.secure_url;
+        }
+      );
+    }
+    const userId = req.user.id;
+    if(!userId){
+      return res.status(400).json({ error: "User ID not found in request" });
+    }
+    const updateData: Record<string, any> = {};
+
+    if (name !== undefined) updateData.name = name;
+    if (bio !== undefined) updateData.bio = bio;
+    if (linkedIn !== undefined) updateData.linkedIn = linkedIn;
+    if (twitter !== undefined) updateData.twitter = twitter;
+    if (profilePicUrl !== undefined) updateData.profilePicUrl = profilePicUrl;
+
+    await client.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    const updatedUser = await client.user.update({
+      where: { id: req.user.id },
+      data: updateData,
+    });
+
+    res.json(updatedUser);
+  }
+);
+paperRouter.get("/profile", userMiddleware, async (req, res) => {
+   const { id } = req.user as any;
+   console.log(id);
    
+   try {
+    const userProfile = await client.user.findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        profilePicUrl: true,
+        linkedIn: true,
+        twitter: true,
+      },
+    });
+    console.log(userProfile);
+    
+    res.json(userProfile);
+   } catch (error) {
+    
+   }
+})
 
 export default paperRouter;
 

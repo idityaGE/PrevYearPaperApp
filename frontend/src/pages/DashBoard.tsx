@@ -1,15 +1,40 @@
-import { useState } from "react";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import { universityData, examTypes, semesters, years } from "../data/universityData";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
-import CustomButton from "../components/CustomButton";
+// import CustomButton from "../components/CustomButton";
+const CustomButton =  lazy(() => import("../components/CustomButton"));
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import PaperCard from "../components/PaperCard";
-import SelectButton from "../components/SelectButton";
-import MessageIcon from "../components/MessageIcon";
-import AdminResponse from "./AdminResponse";
+// import PaperCard from "../components/PaperCard";
+// import SelectButton from "../components/SelectButton";
+const SelectButton = lazy(() => import("../components/SelectButton"));
+const PaperCard = lazy(() => import("../components/PaperCard"));
+
+// import MessageIcon from "../components/MessageIcon";
+// import AdminResponse from "./AdminResponse";
+
+
+type Paper = {
+  id: number;
+  type: string;
+  year: number;
+  fileUrl: string;
+  isVerified: boolean;
+  subject: {
+    name: string;
+    code: string;
+    semester: {
+      number: number;
+      program: {
+        department: {
+          name: string;
+        };
+      };
+    };
+  };
+}
 
 export default function DashBoard() {
   const [selectedDept, setSelectedDept] = useState<string>("");
@@ -18,16 +43,58 @@ export default function DashBoard() {
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
   const [selectedExamType, setSelectedExamType] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const userId = 32; // example user ID
-  const [openMessages, setOpenMessages] = useState(false);
-  const [papers, setPapers] = useState<any[]>([]); // ✅ store papers here
+  // const userId = 32; // example user ID
+  // const [openMessages, setOpenMessages] = useState(false);
 
-  const departments = universityData.map((d) => d.department);
-  const programs =
-    universityData.find((d) => d.department === selectedDept)?.programs || [];
-  const semesterList =
-    programs.find((p) => p.name === selectedProgram)?.semesters || [];
-  const subjects = semesterList.flatMap((s) => s.subjects) || [];
+  const [papers, setPapers] = useState<any[]>([]); 
+  const departments = useMemo(()=>universityData.map((d) => d.department),[])
+  const programs = useMemo(()=> universityData.find((d) => d.department === selectedDept)?.programs || [],[selectedDept]);
+
+const semesterList = useMemo(() => {
+  return programs.find((p) => p.name === selectedProgram)?.semesters || [];
+}, [selectedProgram, programs]);
+
+
+const subjects = useMemo(() => semesterList.flatMap((s) => s.subjects) || [], [semesterList]);
+
+
+const handleDeptChange = useCallback((_:any, val:any) => {
+  setSelectedDept(val || "");
+  setSelectedProgram("");
+  setSelectedSubject("");
+}, []);
+
+const handleProgramChange = useCallback((_:any, val:any) => {
+  setSelectedProgram(val || "");
+  setSelectedSubject("");
+}, []);
+
+const handleSubjectChange = useCallback((_:any, val:any)  => {
+  setSelectedSubject(val || "");
+}, []);
+
+    const cache = useRef<Record<string, Paper[]>>({});
+
+    const fetchPapers = useCallback(async () => {
+      const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${selectedSemester}-${selectedExamType}`;
+      
+      if (cache.current[key]) {
+        setPapers(cache.current[key]);
+        return;
+      }
+
+      const { data } = await axios.post("http://localhost:3000/api/user/papers", {
+        dept: selectedDept,
+        program: selectedProgram,
+        sem: selectedSemester,
+        subject: selectedSubject,
+        examType: selectedExamType,
+      });
+
+      cache.current[key] = data;
+      setPapers(data);
+    }, [selectedDept, selectedProgram, selectedSubject, selectedSemester, selectedExamType]);
+
 
   return (
     <div className="bg-gradient-to-r from-gray-600 to-black via-gray-800 min-h-screen w-full p-5">
@@ -37,11 +104,7 @@ export default function DashBoard() {
         <Select
           placeholder="Select Department"
           value={selectedDept || null}
-          onChange={(_, val) => {
-            setSelectedDept(val || "");
-            setSelectedProgram("");
-            setSelectedSubject("");
-          }}
+          onChange={handleDeptChange}
           indicator={<KeyboardArrowDown />}
           sx={{ width: 240 }}
         >
@@ -56,10 +119,7 @@ export default function DashBoard() {
         <Select
           placeholder="Select Program"
           value={selectedProgram || null}
-          onChange={(_, val) => {
-            setSelectedProgram(val || "");
-            setSelectedSubject("");
-          }}
+          onChange={handleProgramChange}
           indicator={<KeyboardArrowDown />}
           sx={{ width: 240 }}
           disabled={!selectedDept}
@@ -76,7 +136,7 @@ export default function DashBoard() {
         <Select
           placeholder="Select Subject"
           value={selectedSubject || null}
-          onChange={(_, val) => setSelectedSubject(val || "")}
+          onChange={handleSubjectChange}
           indicator={<KeyboardArrowDown />}
           sx={{ width: 240 }}
           disabled={!selectedProgram}
@@ -96,10 +156,12 @@ export default function DashBoard() {
 
 
           {/* <SelectButton placeholder="Select Subject" options={subjects}     onChange={(val) => setSelectedYear(val ? Number(val) : null)} disabled={!selectedProgram} value={selectedSubject || null}/> */}
+        <Suspense fallback={<div>Loading...</div>}>
           <SelectButton placeholder="Select Semester" options={semesters} onChange={(val)=>{setSelectedSemester(val ? Number(val) : null)}} value={selectedSemester ? String(selectedSemester):null}/>
           <SelectButton placeholder="Selected Exam Type" options={examTypes} onChange={(val)=>{setSelectedExamType(val)}} value={selectedExamType || null}/>
           <SelectButton placeholder="Selected year" options={years} onChange={(val)=>{setSelectedYear(val ? Number(val) : null)}} value={selectedYear ? String(selectedYear): null} />
-        
+        </Suspense>
+
       </div>
 
       {/* 📄 Selection Summary */}
@@ -133,43 +195,23 @@ export default function DashBoard() {
         </div>
 
         {/* 🔎 Search Button */}
-        <CustomButton
-          text="Search Papers"
-          onClick={async () => {
-            try {
-              const response = await axios.post("http://localhost:3000/api/user/papers", {
-                dept: selectedDept,
-                program: selectedProgram,
-                sem: selectedSemester,
-                subject: selectedSubject,
-                examType: selectedExamType,
-              });
-
-              const data = response.data;
-
-              if (!data || data.length === 0) {
-                toast.error("No papers found for the selected filters.");
-                return;
-              }
-
-              toast.success(`✅ Found ${data.length} papers!`);
-              setPapers(data); // ✅ Save papers to state
-            } catch (err) {
-              console.error(err);
-              toast.error("Failed to fetch papers.");
-            }
-          }}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <CustomButton
+            text="Search Papers"
+            onClick={fetchPapers}
+          />
+          </Suspense>
       </div>
 
       {/* 📚 Papers List */}
       <div className=" pl-10 mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {papers.map((paper, index) => paper.isVerified ? (
-          <PaperCard
-            key={index}
-            title={paper.title || "Untitled Paper"}
-            description={paper.subject?.name || "No subject info"}
-          />
+          <Suspense fallback={<div>Loading...</div>} key={index}>
+            <PaperCard
+              title={paper.title || "Untitled Paper"}
+              description={paper.subject?.name || "No subject info"}
+            />
+          </Suspense>
         ) : null)}
       </div>
           {/* <MessageIcon userId={userId} onClick={() => setOpenMessages(!openMessages)} />

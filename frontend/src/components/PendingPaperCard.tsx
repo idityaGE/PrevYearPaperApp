@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 interface PendingPaper {
@@ -25,11 +25,19 @@ interface PendingPaper {
 function PendingPapers() {
   const [papers, setPapers] = useState<PendingPaper[]>([]);
 
+  const fetchPapers = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/admin/pending-papers"
+      );
+      setPapers(response.data);
+    } catch (error) {
+      console.error("Error fetching pending papers:", error);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/admin/pending-papers")
-      .then((res) => setPapers(res.data))
-      .catch((err) => console.error("Error fetching pending papers:", err));
+    fetchPapers();
   }, []);
 
   return (

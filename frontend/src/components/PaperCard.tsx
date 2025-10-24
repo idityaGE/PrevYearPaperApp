@@ -1,3 +1,5 @@
+import React from "react";
+
 type PaperCardProps = {
   title: string;
   description: string;
@@ -16,4 +18,4 @@ function PaperCard({ title, description }: PaperCardProps) {
   );
 }
 
-export default PaperCard;
+export default React.memo(PaperCard);

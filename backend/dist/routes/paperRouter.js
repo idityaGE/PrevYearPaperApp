@@ -181,5 +181,122 @@ paperRouter.post('/contact', userMiddleware, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     });
 });
+// Example: queryRoutes.js
+paperRouter.get('/queries/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const queries = await client.query.findMany({
+            where: { userId: parseInt(userId) },
+            orderBy: { createdAt: 'desc' },
+        });
+        res.json(queries);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching queries' });
+    }
+});
+const updateProfileSchema = zod.object({
+    name: zod.string().min(2).max(100).optional(),
+    bio: zod.string().max(500).optional(),
+    profilePicUrl: zod.string().url().optional(),
+    linkedIn: zod.string().url().optional(),
+    twitter: zod.string().url().optional(),
+});
+// paperRouter.put("/updateProfile", userMiddleware, async (req, res) => {
+//   const result = updateProfileSchema.safeParse(req.body);
+//   if (!result.success) {
+//     return res.status(400).json({ errors: result.error.flatten().fieldErrors });
+//   }
+//   const { name, bio, profilePicUrl, linkedIn, twitter } = result.data;
+//   try {
+//     const userId = req.user.id;
+// const updateData: {
+// name?: string;
+// bio?: string;
+// profilePicUrl?: string;
+// linkedIn?: string;
+// twitter?: string;
+// } = {};
+//     if (name !== undefined) updateData.name = name;
+//     if (bio !== undefined) updateData.bio = bio;
+//     if (linkedIn !== undefined) updateData.linkedIn = linkedIn;
+//     if (twitter !== undefined) updateData.twitter = twitter;
+//     // if frontend sends base64 image string
+//     if (profilePicUrl && profilePicUrl.startsWith("data:image")) {
+//       const uploadResult = await cloudinary.uploader.upload(profilePicUrl, {
+//         folder: "profile_pictures",
+//       });
+//       updateData.profilePicUrl = uploadResult.secure_url;
+//     }
+//     const updatedUser = await client.user.update({
+//       where: { id: userId },
+//       data: updateData,
+//     });
+//     return res.json(updatedUser);
+//   } catch (error) {
+//     console.error("Error updating profile:", error);
+//     return res.status(500).json({ error: "Failed to update profile" });
+//   }
+// });
+paperRouter.put("/updateProfile", userMiddleware, upload.single("profilePic"), // 'profilePic' must match your frontend field name
+async (req, res) => {
+    const { name, bio, linkedIn, twitter } = req.body;
+    let profilePicUrl;
+    if (req.file) {
+        // Upload to cloudinary
+        const uploadResult = await cloudinary.uploader.upload_stream({ folder: "profile_pictures" }, (error, result) => {
+            if (error)
+                return res.status(500).json({ error: "Cloudinary upload failed" });
+            profilePicUrl = result?.secure_url;
+        });
+    }
+    const userId = req.user.id;
+    if (!userId) {
+        return res.status(400).json({ error: "User ID not found in request" });
+    }
+    const updateData = {};
+    if (name !== undefined)
+        updateData.name = name;
+    if (bio !== undefined)
+        updateData.bio = bio;
+    if (linkedIn !== undefined)
+        updateData.linkedIn = linkedIn;
+    if (twitter !== undefined)
+        updateData.twitter = twitter;
+    if (profilePicUrl !== undefined)
+        updateData.profilePicUrl = profilePicUrl;
+    await client.user.update({
+        where: { id: userId },
+        data: updateData,
+    });
+    const updatedUser = await client.user.update({
+        where: { id: req.user.id },
+        data: updateData,
+    });
+    res.json(updatedUser);
+});
+paperRouter.get("/profile", userMiddleware, async (req, res) => {
+    const { id } = req.user;
+    console.log(id);
+    try {
+        const userProfile = await client.user.findUnique({
+            where: { id: Number(id) },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                bio: true,
+                profilePicUrl: true,
+                linkedIn: true,
+                twitter: true,
+            },
+        });
+        console.log(userProfile);
+        res.json(userProfile);
+    }
+    catch (error) {
+    }
+});
 export default paperRouter;
 //# sourceMappingURL=paperRouter.js.map

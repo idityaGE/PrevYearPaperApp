@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import PendingPapers from "../components/PendingPaperCard";
+import  { lazy, Suspense, useState } from "react";
+// import PendingPapers from "../components/PendingPaperCard";
 // import PendingQueries from "../components/PendingQueries";
-import SideComponent from "../components/SideComponent";
-import AdminResponses from "./AdminResponse";
+const SideComponent = lazy(()=> import("../components/SideComponent"));
+// import SideComponent from "../components/SideComponent";
+// import AdminResponses from "./AdminResponse";
+const PendingPapers = lazy(()=> import("../components/PendingPaperCard"));
+// const PendingQueries = lazy(()=> import("../components/PendingQueries"));
+const AdminResponses = lazy(()=> import("./AdminResponse"));
 
 function Admin() {
   const [activeSection, setActiveSection] = useState("Pending papers");
@@ -10,9 +14,17 @@ function Admin() {
   const renderContent = () => {
     switch (activeSection) {
       case "Pending papers":
-        return <PendingPapers />;
+        return (
+          <Suspense fallback={<div>Loading...</div>}>
+             <PendingPapers />
+          </Suspense>
+        )
       case "Pending Queries":
-        return <AdminResponses />;
+        return (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AdminResponses />
+          </Suspense>
+        );
       case "See all the papers":
         return (
           <div className="text-xl text-yellow-300">All Papers list will show here...</div>
@@ -41,26 +53,31 @@ function Admin() {
         </h2>
 
         <div className="space-y-4 w-full">
+          <Suspense fallback={<div>Loading...</div>}>
           <SideComponent
             title="Pending papers"
             isActive={activeSection === "Pending papers"}
             onClick={() => setActiveSection("Pending papers")}
           />
+
           <SideComponent
             title="Pending Queries"
             isActive={activeSection === "Pending Queries"}
             onClick={() => setActiveSection("Pending Queries")}
           />
+
           <SideComponent
             title="See all the papers"
             isActive={activeSection === "See all the papers"}
             onClick={() => setActiveSection("See all the papers")}
           />
+
           <SideComponent
             title="See all the users"
             isActive={activeSection === "See all the users"}
             onClick={() => setActiveSection("See all the users")}
           />
+          </Suspense>
         </div>
       </div>
 

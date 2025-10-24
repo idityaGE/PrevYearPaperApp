@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { lazy, useState ,Suspense, useMemo } from "react";
 import { universityData, examTypes, semesters, years } from "../data/universityData";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
-import SelectButton from "../components/SelectButton";
-import InputBox from "../components/InputBox";
+// import SelectButton from "../components/SelectButton";
+const SelectButton = lazy(() => import("../components/SelectButton"));
+// import InputBox from "../components/InputBox";
+const InputBox = lazy(() => import("../components/InputBox"));
+
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -25,12 +28,17 @@ export default function AddPaper() {
     setFile(e.target.files[0]);
   };
 
-  const departments = universityData.map((d) => d.department);
-  const programs =
-    universityData.find((d) => d.department === selectedDept)?.programs || [];
-  const semesterList =
-    programs.find((p) => p.name === selectedProgram)?.semesters || [];
-  const subjects = semesterList.flatMap((s) => s.subjects) || [];
+const departments = useMemo(() => universityData.map(d => d.department), []);
+const programs = useMemo(() =>
+  universityData.find(d => d.department === selectedDept)?.programs || [],
+  [selectedDept]
+);
+const semesterList = useMemo(() =>
+  programs.find(p => p.name === selectedProgram)?.semesters || [],
+  [selectedProgram, programs]
+);
+const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [semesterList]);
+
 /*
   const handleSubmit = async () => {
     try {
@@ -227,31 +235,53 @@ export default function AddPaper() {
           </Select>
 
           {/* Semester */}
-          <SelectButton
-            placeholder="Select Exam Type"
-            options={examTypes}
-            onChange={(val) => setSelectedExamType(val)}
-            value={selectedExamType || null}
-          />
-      <SelectButton
-        placeholder="Select Year"
-        options={years.map(String)}   // make sure options are strings
-        onChange={(val) => setSelectedYear(val)}
-        value={selectedYear}
-      />
-      <SelectButton
-      placeholder="Select Semester"
-      options={semesters.map(String)}
-      onChange={(val) => setSelectedSemester(val)}
-      value={selectedSemester}
-    />
+          <Suspense fallback={<div>Loading...</div>}>
+            <SelectButton
+              placeholder="Select Exam Type"
+              options={examTypes}
+              onChange={(val) => setSelectedExamType(val)}
+              value={selectedExamType || null}
+            />
+            <SelectButton
+              placeholder="Select Year"
+              options={years.map(String)}   // make sure options are strings
+              onChange={(val) => setSelectedYear(val)}
+              value={selectedYear}
+            />
+
+            <SelectButton
+              placeholder="Select Year"
+              options={years.map(String)}   // make sure options are strings
+              onChange={(val) => setSelectedYear(val)}
+              value={selectedYear}
+            />
+
+            <SelectButton
+              placeholder="Select Semester"
+              options={semesters.map(String)}
+              onChange={(val) => setSelectedSemester(val)}
+              value={selectedSemester}
+            />
+
           {/* File Upload */}
-          <InputBox
-            type="file"
-            placeholder="Choose the paper"
-            onChange={handleFileChange}
-            accept=".pdf,.jpg,.png"
-          />
+            <InputBox
+              type="file"
+              placeholder="Choose the paper"
+              onChange={handleFileChange}
+              accept=".pdf,.jpg,.png"
+            />
+
+            <SelectButton
+              placeholder="Select Semester"
+              options={semesters.map(String)}
+              onChange={(val) => setSelectedSemester(val)}
+              value={selectedSemester}
+            />
+          </Suspense>
+
+
+
+
 
           {/* Submit Button */}
           <button

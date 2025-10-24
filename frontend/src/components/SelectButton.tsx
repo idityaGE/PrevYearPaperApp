@@ -1,6 +1,7 @@
 import Select, { selectClasses } from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import React from "react";
 
 interface SelectButtonProps {
   placeholder: string;
@@ -11,7 +12,7 @@ interface SelectButtonProps {
 }
 
 
-export default function SelectButton({
+export default React.memo(function SelectButton({
   placeholder,
   options,
   value,
@@ -42,4 +43,4 @@ export default function SelectButton({
       ))}
     </Select>
   );
-}
+});

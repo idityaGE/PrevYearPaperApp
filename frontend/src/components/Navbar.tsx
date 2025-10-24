@@ -9,14 +9,14 @@ function Navbar() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // ✅ Logout flow
+      
       localStorage.removeItem("token");
       toast.success("Logged out successfully!");
       setTimeout(() => {
         navigate("/signin");
       }, 1500);
     } else {
-      // ✅ Go to login page
+      
       navigate("/signin");
     }
   };
