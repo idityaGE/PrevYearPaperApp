@@ -3,6 +3,11 @@ import { signinValidation, signUpValidation } from '../lib/validations.js';
 import express from 'express';
 import client from '../lib/initClient.js';
 import { generateToken } from '../lib/util.js';
+import nodemailer from 'nodemailer';
+import crypto  from 'crypto';
+
+
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 
@@ -32,6 +37,10 @@ export const signup = async (req: express.Request, res: express.Response)=>{
     //create a new user 
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
+
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
     const newUser = await client.user.create({
       data:{
         name,
@@ -39,11 +48,107 @@ export const signup = async (req: express.Request, res: express.Response)=>{
         password: hashedPassword
       }
     })
-    // generateToken(newUser.id,req);
+
     const token = generateToken(newUser.id,res);
 
-    return res.status(201).json({ user: newUser, token }); 
+    await transporter.sendMail({
+      from: 'pradeepkumar434680@gmail.com',
+      to: email,
+      subject: 'OTP Verification',
+      text: `Your OTP is: ${otp}`
+    });
+
+     res.status(201).json({ message: 'User registered. Please verify OTP sent to email.' ,user:newUser});
 }
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'pradeepkumar434680@gmail.com',
+        pass: 'friuzwkebgvpkmbu'
+    }
+});
+
+
+const generateOTP = () => crypto.randomInt(100000, 999999).toString();
+
+
+
+
+export const verifyOTP = async (req:express.Request, res:express.Response) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await client.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) return res.status(400).json({ message: 'User not found' });
+
+        if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
+
+        if (!user.verficationToken || user.verficationToken !== otp || !user.verficationTokenExpiresAt || user.verficationTokenExpiresAt < new Date()) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        await client.user.update({
+            where: { id: user.id },
+            data: {
+                isVerified: true,
+                verficationToken: null,
+                verficationTokenExpiresAt: null
+            }
+        });
+
+        res.json({ message: 'Email verified successfully. You can now log in.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error verifying OTP', error });
+    }
+};
+
+
+export const resendOTP = async (req:express.Request, res:express.Response) => {
+    try {
+        const { email } = req.body;
+        const user = await client.user.findUnique({
+          where:{email}
+        });
+
+        if (!user) return res.status(400).json({ message: 'User not found' });
+        if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
+
+        const otp = generateOTP();
+
+        await client.user.update({
+          where:{
+            id:user.id
+          },
+          data:{
+            verficationToken:otp,
+            verficationTokenExpiresAt:new Date(Date.now() + 10 * 60 * 1000)
+          }
+        })
+ 
+
+        await transporter.sendMail({
+            from: 'pradeepkumar434680@gmail.com',
+            to: email,
+            subject: 'Resend OTP Verification',
+            text: `Your new OTP is: ${otp}`
+        });
+
+        res.json({ message: 'OTP resent successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error resending OTP', error });
+    }
+};
+
+
+
+
+
+
+
+
 export const signin = async(req:express.Request,res:express.Response)=>{
     const { email , password } = req.body;
     const validation = signinValidation.safeParse(req.body);  
@@ -61,6 +166,10 @@ export const signin = async(req:express.Request,res:express.Response)=>{
     if (!user) {
         return res.status(400).json({ errors: { email: ['User not found'] } });
     }
+
+      if (!user.isVerified) {
+        return res.status(400).json({ message: 'Email not verified. Please verify OTP.' });
+      }
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {

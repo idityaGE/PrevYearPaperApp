@@ -64,14 +64,16 @@ const handleDeptChange = useCallback((_:any, val:any) => {
   setSelectedSubject("");
 }, []);
 
-const handleProgramChange = useCallback((_:any, val:any) => {
-  setSelectedProgram(val || "");
-  setSelectedSubject("");
-}, []);
+      const handleProgramChange = useCallback((_:any, val:any) => {
+        setSelectedProgram(val || "");
+        setSelectedSubject("");
+      }, []);
 
-const handleSubjectChange = useCallback((_:any, val:any)  => {
-  setSelectedSubject(val || "");
-}, []);
+      
+
+      const handleSubjectChange = useCallback((_:any, val:any)  => {
+        setSelectedSubject(val || "");
+      }, []);
 
     const cache = useRef<Record<string, Paper[]>>({});
 
@@ -217,7 +219,7 @@ const handleSubjectChange = useCallback((_:any, val:any)  => {
           </Suspense>
       </div>
 
-      {/* 📚 Papers List */}
+     {/* // here virtulization can be use */}
    <div className="px-4 mt-10 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
 
         {papers.map((paper, index) => paper.isVerified ? (

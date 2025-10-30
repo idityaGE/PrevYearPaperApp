@@ -203,42 +203,6 @@ const updateProfileSchema = zod.object({
     linkedIn: zod.string().url().optional(),
     twitter: zod.string().url().optional(),
 });
-// paperRouter.put("/updateProfile", userMiddleware, async (req, res) => {
-//   const result = updateProfileSchema.safeParse(req.body);
-//   if (!result.success) {
-//     return res.status(400).json({ errors: result.error.flatten().fieldErrors });
-//   }
-//   const { name, bio, profilePicUrl, linkedIn, twitter } = result.data;
-//   try {
-//     const userId = req.user.id;
-// const updateData: {
-// name?: string;
-// bio?: string;
-// profilePicUrl?: string;
-// linkedIn?: string;
-// twitter?: string;
-// } = {};
-//     if (name !== undefined) updateData.name = name;
-//     if (bio !== undefined) updateData.bio = bio;
-//     if (linkedIn !== undefined) updateData.linkedIn = linkedIn;
-//     if (twitter !== undefined) updateData.twitter = twitter;
-//     // if frontend sends base64 image string
-//     if (profilePicUrl && profilePicUrl.startsWith("data:image")) {
-//       const uploadResult = await cloudinary.uploader.upload(profilePicUrl, {
-//         folder: "profile_pictures",
-//       });
-//       updateData.profilePicUrl = uploadResult.secure_url;
-//     }
-//     const updatedUser = await client.user.update({
-//       where: { id: userId },
-//       data: updateData,
-//     });
-//     return res.json(updatedUser);
-//   } catch (error) {
-//     console.error("Error updating profile:", error);
-//     return res.status(500).json({ error: "Failed to update profile" });
-//   }
-// });
 paperRouter.put("/updateProfile", userMiddleware, upload.single("profilePic"), // 'profilePic' must match your frontend field name
 async (req, res) => {
     const { name, bio, linkedIn, twitter } = req.body;

@@ -71,23 +71,27 @@ enum PaperType {
 
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  papers    Paper[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bio       String?
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  isVerified    Boolean   @default(false)
+
+  verficationToken       String?
+  verficationTokenExpiresAt  DateTime?
+
+  papers        Paper[]
+  queries       Query[]
+  responses     Query[]   @relation("AdminResponses")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  bio           String?
   profilePicUrl String?
-  linkedIn   String?
-  twitter    String?
-  
-  // Relations
-  queries   Query[]    // User who asked the queries
-  responses Query[]    @relation("AdminResponses") // Admin responses to user queries
+  linkedIn      String?
+  twitter       String?
 }
+
 
 
 enum Role {

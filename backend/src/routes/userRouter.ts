@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signup,signin } from "../controllers/auth.controllers.js";
+import { signup,signin, verifyOTP, resendOTP } from "../controllers/auth.controllers.js";
 import client from "../lib/initClient.js";
 import zod from 'zod'
 import userMiddleware from "../middleware/user.js";
@@ -10,7 +10,8 @@ authRouter.post("/signup", signup);
 
 authRouter.post("/signin", signin);
 
+authRouter.post('/verify-otp', verifyOTP);
 
-
+authRouter.post('/resend-otp', resendOTP);
 
 export default authRouter;
