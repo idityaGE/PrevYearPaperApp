@@ -5,7 +5,17 @@ import client from '../lib/initClient.js';
 import { generateToken } from '../lib/util.js';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import { success } from 'zod';
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
+let token = "";
+async function sendOTP(email, otp) {
+    await transporter.sendMail({
+        from: 'pradeepkumar434680@gmail.com',
+        to: email,
+        subject: 'OTP Verification',
+        text: `Your OTP is: ${otp}`
+    });
+}
 export const signup = async (req, res) => {
     const { name, email, password } = req.body;
     const validation = signUpValidation.safeParse(req.body);
@@ -31,17 +41,50 @@ export const signup = async (req, res) => {
         data: {
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            verficationToken: otp,
+            verficationTokenExpiresAt: otpExpiry
         }
     });
-    const token = generateToken(newUser.id, res);
-    await transporter.sendMail({
-        from: 'pradeepkumar434680@gmail.com',
-        to: email,
-        subject: 'OTP Verification',
-        text: `Your OTP is: ${otp}`
-    });
-    res.status(201).json({ message: 'User registered. Please verify OTP sent to email.', user: newUser });
+    token = generateToken(newUser.id, res);
+    await sendOTP(email, otp);
+    res.status(201).json({ message: 'User registered. Please verify OTP sent to email.', user: newUser, token: token });
+};
+export const sendEmail = async (req, res) => {
+    //fetch otp from the db req
+    const { email } = req.body;
+    try {
+        if (!email || email == "") {
+            return res.status(404).json({ message: "Email is blank" });
+        }
+        const user = await client.user.findUnique({
+            where: {
+                email
+            }
+        });
+        if (!user)
+            return res.status(400).json({ message: 'User not found' });
+        if (user.isVerified)
+            return res.status(400).json({ message: 'User already verified' });
+        const otp = generateOTP();
+        await client.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                verficationToken: otp,
+                verficationTokenExpiresAt: new Date(Date.now() + 10 * 60 * 1000)
+            }
+        });
+        await sendOTP(email, otp);
+        return res.status(201).json({
+            message: "OTP sent successfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
 };
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -54,6 +97,9 @@ const generateOTP = () => crypto.randomInt(100000, 999999).toString();
 export const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
+        if (!email || email == "") {
+            return res.status(404).json({ message: "Email is blank" });
+        }
         const user = await client.user.findUnique({
             where: { email }
         });
@@ -61,8 +107,11 @@ export const verifyOTP = async (req, res) => {
             return res.status(400).json({ message: 'User not found' });
         if (user.isVerified)
             return res.status(400).json({ message: 'User already verified' });
-        if (!user.verficationToken || user.verficationToken !== otp || !user.verficationTokenExpiresAt || user.verficationTokenExpiresAt < new Date()) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        if (!user.verficationToken || user.verficationToken !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP', user: user });
+        }
+        if (!user.verficationTokenExpiresAt || user.verficationTokenExpiresAt < new Date()) {
+            return res.status(400).json({ message: 'OTP expired' });
         }
         await client.user.update({
             where: { id: user.id },
@@ -72,7 +121,7 @@ export const verifyOTP = async (req, res) => {
                 verficationTokenExpiresAt: null
             }
         });
-        res.json({ message: 'Email verified successfully. You can now log in.' });
+        res.json({ message: 'Email verified successfully. You can now log in.', success: "Success", token: token });
     }
     catch (error) {
         res.status(500).json({ message: 'Error verifying OTP', error });
@@ -98,12 +147,7 @@ export const resendOTP = async (req, res) => {
                 verficationTokenExpiresAt: new Date(Date.now() + 10 * 60 * 1000)
             }
         });
-        await transporter.sendMail({
-            from: 'pradeepkumar434680@gmail.com',
-            to: email,
-            subject: 'Resend OTP Verification',
-            text: `Your new OTP is: ${otp}`
-        });
+        await sendOTP(email, otp);
         res.json({ message: 'OTP resent successfully.' });
     }
     catch (error) {
@@ -125,7 +169,7 @@ export const signin = async (req, res) => {
         return res.status(400).json({ errors: { email: ['User not found'] } });
     }
     if (!user.isVerified) {
-        return res.status(400).json({ message: 'Email not verified. Please verify OTP.' });
+        return res.status(400).json({ notVerified: 'Email not verified. Please verify OTP.' });
     }
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
