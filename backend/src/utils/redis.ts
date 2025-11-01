@@ -11,7 +11,7 @@ export const getRedisClient = async () => {
       url: process.env.REDIS_URL || "redis://localhost:6379"
     });
 
-    redisClient.on("error", (err) => console.error("Redis Client Error", err));
+    redisClient.on("error", (err:any) => console.error("Redis Client Error", err));
 
     await redisClient.connect();
     console.log("Redis connected");
