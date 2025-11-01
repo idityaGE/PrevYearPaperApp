@@ -19,6 +19,7 @@ function App() {
     <BrowserRouter>
       <Navbar />
 
+      {/* ✅ Page wrapper with padding below navbar */}
       <div className="pt-20 bg-black min-h-screen text-white">
         <Routes>
           <Route path="/" element={<DashBoard />} />

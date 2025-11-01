@@ -46,11 +46,10 @@ export function InputOTPForm() {
       if (res.data?.success) {
         toast.success("✅ OTP verified successfully");
         const item = localStorage.getItem("token");
-        
         if(!item){
           localStorage.setItem("token",res.data.token);
         }
-
+        
         clearEmail(); // clean store
         
          navigate("/")
