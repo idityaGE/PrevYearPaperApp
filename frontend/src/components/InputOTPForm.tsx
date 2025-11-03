@@ -14,18 +14,22 @@ import {
 } from "../components/ui/input-otp"
 
 
+
+
 import axios from "axios"
 import { useAuthStore } from "../store/authStore"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 
 const FormSchema = z.object({
   pin: z.string().min(6, { message: "Your one-time password must be 6 characters." }),
 })
 
 export function InputOTPForm() {
-  //const email = useAuthStore((state) => state.email);
-  const email = localStorage.getItem('email');
-  const clearEmail = useAuthStore((state) => state.clearEmail);
+  const [ searchParams,setSearchParams] = useSearchParams();
+  const { signin} = useAuthStore();
+
+  const userEmail = searchParams.get('email');
+
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -39,21 +43,23 @@ export function InputOTPForm() {
       console.log(typeof otp,"=",otp);
       
         const res = await axios.post("http://localhost:3000/api/auth/verify-otp", {
-          email,
+          email:userEmail,
           otp
         });
 
-      if (res.data?.success) {
-        toast.success("✅ OTP verified successfully");
-        const item = localStorage.getItem("token");
-        
-        if(!item){
-          localStorage.setItem("token",res.data.token);
-        }
+        if (res.data?.success) {
+          toast.success("✅ OTP verified successfully");
+          // const { token } = useAuthStore();
+          if(!userEmail){
+            throw new Error("Email not found");
+          }
+          signin(res.data.token,userEmail);
 
-        clearEmail(); // clean store
         
-         navigate("/")
+
+         // clean store
+        
+         navigate("/");  
       } else {
         toast.error(res.data?.message || "OTP verification failed");
       }

@@ -7,7 +7,6 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { success } from 'zod';
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
-let token = "";
 async function sendOTP(email, otp) {
     await transporter.sendMail({
         from: 'pradeepkumar434680@gmail.com',
@@ -46,9 +45,9 @@ export const signup = async (req, res) => {
             verficationTokenExpiresAt: otpExpiry
         }
     });
-    token = generateToken(newUser.id, res);
+    //  token = generateToken(newUser.id,res);
     await sendOTP(email, otp);
-    res.status(201).json({ message: 'User registered. Please verify OTP sent to email.', user: newUser, token: token });
+    res.status(201).json({ message: 'User registered. Please verify OTP sent to email.', user: newUser });
 };
 export const sendEmail = async (req, res) => {
     //fetch otp from the db req
@@ -121,6 +120,7 @@ export const verifyOTP = async (req, res) => {
                 verficationTokenExpiresAt: null
             }
         });
+        const token = generateToken(user.id, res);
         res.json({ message: 'Email verified successfully. You can now log in.', success: "Success", token: token });
     }
     catch (error) {
@@ -166,17 +166,17 @@ export const signin = async (req, res) => {
         }
     });
     if (!user) {
-        return res.status(400).json({ errors: { email: ['User not found'] } });
+        return res.status(400).json({ errorMessage: 'User not found' });
     }
     if (!user.isVerified) {
-        return res.status(400).json({ notVerified: 'Email not verified. Please verify OTP.' });
+        return res.status(400).json({ errorMessage: 'Email not verified. Please verify OTP.' });
     }
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
-        return res.status(400).json({ errors: { password: ['Invalid Credentials'] } });
+        return res.status(400).json({ errorMessage: 'Invalid Credentials' });
     }
     // now signin in actually
     const token = generateToken(user.id, res);
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ user, token, success: success });
 };
 //# sourceMappingURL=auth.controllers.js.map

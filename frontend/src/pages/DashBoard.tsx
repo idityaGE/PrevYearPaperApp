@@ -82,6 +82,7 @@ const subjects = useMemo(() => semesterList.flatMap((s) => s.subjects) || [], [s
     const cache = useRef<Record<string, Paper[]>>({});
 
     const fetchPapers = useCallback(async () => {
+
       const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${selectedSemester}-${selectedExamType}`;
       
       if (cache.current[key]) {
@@ -95,9 +96,12 @@ const subjects = useMemo(() => semesterList.flatMap((s) => s.subjects) || [], [s
         sem: selectedSemester,
         subject: selectedSubject,
         examType: selectedExamType,
+        year:selectedYear
       });
 
       cache.current[key] = data;
+      console.log(data);
+      
       setPapers(data);
     }, [selectedDept, selectedProgram, selectedSubject, selectedSemester, selectedExamType]);
 
@@ -227,10 +231,13 @@ const subjects = useMemo(() => semesterList.flatMap((s) => s.subjects) || [], [s
    <div className="px-4 mt-10 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center">
 
         {papers.map((paper, index) => paper.isVerified ? (
+          
+         
           <Suspense fallback={<div>Loading...</div>} key={index}>
+            
             <PaperCard
               title={paper.title || "Untitled Paper"}
-              description={paper.subject?.name || "No subject info"}
+              description={ paper.year }
             />
           </Suspense>
         ) : null)}

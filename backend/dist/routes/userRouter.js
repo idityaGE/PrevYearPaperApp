@@ -3,11 +3,12 @@ import { signup, signin, verifyOTP, resendOTP, sendEmail } from "../controllers/
 import client from "../lib/initClient.js";
 import zod from 'zod';
 import userMiddleware from "../middleware/user.js";
+import { authLimiter, otpResendLimiter } from "../utils/rateLimit.js";
 const authRouter = Router();
-authRouter.post("/signup", signup);
-authRouter.post("/signin", signin);
-authRouter.post('/verify-otp', verifyOTP);
-authRouter.post('/resend-otp', resendOTP);
-authRouter.post('/send-email', sendEmail);
+authRouter.post("/signup", authLimiter, signup);
+authRouter.post("/signin", authLimiter, signin);
+authRouter.post('/verify-otp', otpResendLimiter, verifyOTP);
+authRouter.post('/resend-otp', otpResendLimiter, resendOTP);
+authRouter.post('/send-email', otpResendLimiter, sendEmail);
 export default authRouter;
 //# sourceMappingURL=userRouter.js.map

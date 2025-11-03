@@ -11,8 +11,11 @@ const InputBox = lazy(() => import("../components/InputBox"));
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuthStore } from "../store/authStore";
 
 export default function AddPaper() {
+  const {token} = useAuthStore();
+
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
@@ -23,6 +26,7 @@ export default function AddPaper() {
   const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
 
   const [selectedExamType, setSelectedExamType] = useState<string>("");
+
 
   const handleFileChange = (e: any) => {
     setFile(e.target.files[0]);
@@ -41,8 +45,10 @@ const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [sem
 
 
   const handleSubmit = async () => {
+
+    console.log(selectedDept,selectedExamType,selectedProgram,selectedSemester,selectedSubject,selectedYear);
+    
   try {
-    const token = localStorage.getItem("token");
     if (!token || token.length < 20) {
       return navigate("/signin");
     }

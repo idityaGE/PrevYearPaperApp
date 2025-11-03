@@ -22,14 +22,12 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 
 export function SignupComponent() {
-  const navigate = useNavigate();
-  const setEmail = useAuthStore((state) => state.setEmail);
-  const setToken = useAuthStore((state) => state.setToken);
+  const navigate = useNavigate(); 
+  const [email,setEmail] = useState("");
 
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
-  const email = useAuthStore((state) => state.email);
   
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -46,23 +44,13 @@ export function SignupComponent() {
         password,
       });
 
-      const { token, message } = response.data;
+      const {  message ,user } = response.data;
 
-      if (!token) {
-        toast.error("Sign up failed ...");
-        return;
-      }
-
-      // Save token in Zustand if you want
-      localStorage.setItem("email",email);
-      // useAuthStore.getState().setToken?.(token);
-      setToken(token)
-      setEmail(email);
-
+     
       toast.success(message || "User registered successfully! Please verify your email.");
 
-      // Navigate to the email verification page
-      navigate("/email-verification"); 
+      
+      navigate(`/email-verification?email=${user.email}`); 
 
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong during signup");

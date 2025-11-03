@@ -1,64 +1,28 @@
 import { Router } from "express";
 import client from "../lib/initClient.js";
+import { getPendingPapers, verfyPaperById } from "../controllers/admin.controllers.js";
 const adminRouter = Router();
 // adminRouter.post('/signup',(req,res)=>{
 //     const {name,email,password} = req.body;
 // })
-adminRouter.get("/pending-papers", async (req, res) => {
-    try {
-        const pendingPapers = await client.paper.findMany({
-            where: { isVerified: false },
-            include: {
-                subject: {
-                    include: {
-                        semester: {
-                            include: {
-                                program: { include: { department: true } },
-                            },
-                        },
-                    },
-                },
-            },
-        });
-        res.json(pendingPapers);
-    }
-    catch (error) {
-        console.error("Error fetching pending papers:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
-adminRouter.patch("/verify-paper/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        console.log(id);
-        const updated = await client.paper.update({
-            where: { id: Number(id) },
-            data: { isVerified: true },
-        });
-        res.json({ message: "Paper verified ", paper: updated });
-    }
-    catch (error) {
-        console.error("Error verifying paper:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
+adminRouter.get("/pending-papers", getPendingPapers);
+adminRouter.patch("/verify-paper/:id", verfyPaperById);
 adminRouter.delete('/paper/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        //delete paper with the given id
-        await client.paper.delete({
-            where: {
-                id: Number(id)
-            }
-        });
-        return res.json({
-            message: "Working delete method"
-        });
-    }
-    catch (error) {
-        console.error("Error deleting paper:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+    // try {
+    //   const {id} = req.params;
+    //   //delete paper with the given id
+    //   await client.paper.delete({
+    //     where:{
+    //       id:Number(id)
+    //     }
+    //   })
+    //   return res.json({
+    //     message:"Working delete method"
+    //   })
+    // } catch (error) {
+    //   console.error("Error deleting paper:", error);
+    //   res.status(500).json({ error: "Internal server error" });
+    // }
 });
 adminRouter.put('/paper/:id', async (req, res) => {
     try {

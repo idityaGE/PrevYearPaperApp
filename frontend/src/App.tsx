@@ -11,9 +11,22 @@ import Admin from "./pages/Admin";
 import ProfilePage from "./pages/ProfilePage";
 import OtpVerification from "./pages/OtpVerification";
 import SendMail from "./pages/SendMail";
+import Demo from "./pages/Demo";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/authStore";
 
 function App() {
-  const token = localStorage.getItem('token');
+  const { signin,token }  = useAuthStore();
+  useEffect(()=>{
+     const token = localStorage.getItem('token');
+      const email = localStorage.getItem('email');
+
+     if(token && email){
+      signin(token, email);
+     }
+
+  },[signin])
+
 
   return (
     <BrowserRouter>
@@ -21,11 +34,12 @@ function App() {
 
       <div className="pt-20 bg-black min-h-screen text-white">
         <Routes>
+           <Route path="/demo" element={<Demo />} />
           <Route path="/" element={<DashBoard />} />
           <Route path="/signup" element={<SignupPageComponent />} />
           <Route path="/signin" element={<SigninPageComponent />} />
           <Route path="/email-verification" element={<OtpVerification />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={token? <Contact />:<SigninPageComponent/>} />
           <Route path="/features" element={<Features />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/send-otp" element={<SendMail />} />

@@ -2,6 +2,7 @@ import React, { useEffect, useState, type ChangeEvent } from "react";
 import { MessageSquare, Send } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuthStore } from "../store/authStore";
 
 // ✅ Define Query and User types
 interface User {
@@ -25,6 +26,7 @@ const AdminResponse: React.FC = () => {
   const [error, setError] = useState<string>("");
 
   // ✅ Fetch all pending queries
+  const { token } = useAuthStore();
   useEffect(() => {
     const fetchQueries = async () => {
       try {
@@ -32,7 +34,7 @@ const AdminResponse: React.FC = () => {
           "http://localhost:3000/api/admin/queries",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -50,6 +52,7 @@ const AdminResponse: React.FC = () => {
 
   // ✅ Handle send response
   const handleSendResponse = async (queryId: number, responseText: string) => {
+    const { token } = useAuthStore();
     try {
       if (!responseText.trim()) return;
 
@@ -58,7 +61,7 @@ const AdminResponse: React.FC = () => {
         { response: responseText },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

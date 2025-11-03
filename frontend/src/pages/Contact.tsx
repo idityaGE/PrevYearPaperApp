@@ -1,8 +1,9 @@
 import axios from "axios";
-import { useState } from "react";
+import {  useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import React from "react";
+import { useAuthStore } from "../store/authStore";
 
 type FormData = {
   firstName: string;
@@ -49,6 +50,7 @@ const InputField = ({ label, name, type = "text", placeholder, value, onChange, 
 );
 
 function Contact() {
+  const { token} = useAuthStore();
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -56,6 +58,9 @@ function Contact() {
     subject: "",
     message: "",
   });
+
+
+
   const [successMessage, setSuccessMessage] = useState(""); // <-- UI feedback
   const navigate = useNavigate();
 
@@ -74,8 +79,7 @@ function Contact() {
       toast.error("Please fill out all fields.");
       return;
     }
-
-    const token = localStorage.getItem("token");
+  
     if (!token || token.length < 20) {
       navigate("/signin");
       return;
@@ -133,7 +137,7 @@ function Contact() {
                   <li className="flex items-center space-x-3">
                     <span className="text-indigo-400 text-2xl">📞</span>
                     <p className="text-gray-300">
-                      <span className="font-semibold text-white">Phone:</span> (123) 34567890
+                      <span className="font-semibold text-white">Phone:</span> (+91) 8650152081
                     </p>
                   </li>
                   <li className="flex items-center space-x-3">
@@ -141,11 +145,11 @@ function Contact() {
                     <p className="text-gray-300">
                       <span className="font-semibold text-white">Email:</span>{" "}
                       <a href="mailto:email@example.com" className="ml-1 text-indigo-300 hover:text-indigo-400 transition-colors">
-                        email@example.com
+                        pradeepkumar434680@gmail.com
                       </a>
                     </p>
                   </li>
-                  <li className="flex items-center space-x-3">
+                  {/* <li className="flex items-center space-x-3">
                     <span className="text-indigo-400 text-2xl">🌐</span>
                     <p className="text-gray-300">
                       <span className="font-semibold text-white">Web:</span>{" "}
@@ -153,7 +157,7 @@ function Contact() {
                         shadcnblocks.com
                       </a>
                     </p>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
             </div>

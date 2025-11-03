@@ -6,14 +6,18 @@ import cloudinary from "../utils/cloudinary.js";
 import { Readable } from "stream";
 export const getPapers = async (req: express.Request, res: express.Response) => {
   try {
-    const { dept, program, sem, subject, examType } = req.body;
+    const { dept, program, sem, subject, examType, year } = req.body;
 
     const where: any = {
-      isVerified: true, 
-     };
+      isVerified: true,
+    };
 
     if (examType) {
       where.type = examType as PaperType;
+    }
+
+    if (year) {
+      where.year = Number(year); // ✅ Filter by year
     }
 
     if (subject || sem || program || dept) {
@@ -39,7 +43,7 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
 
           if (dept) {
             where.subject.semester.program.department = {
-              name: dept
+              name: dept,
             };
           }
         }
@@ -55,14 +59,14 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
               include: {
                 program: {
                   include: {
-                    department: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    department: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     return res.json(papers);
@@ -70,7 +74,8 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
     console.error("Error fetching papers:", error);
     res.status(500).json({ error: "Something went wrong!" });
   }
-}
+};
+
 
 
 

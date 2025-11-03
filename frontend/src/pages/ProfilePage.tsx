@@ -1,22 +1,25 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 const InputForProfile = lazy(() => import("../components/InputForProfile"));
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-
+  // const {email} = useAuthStore();
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
   const [bio, setBio] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
   const [linkedinProfile, setLinkedinProfile] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
+  const { token } = useAuthStore();
   const fetchUserInfo = async () => {
-    const token = localStorage.getItem("token");
+
     if (!token || token.length < 20) {
       navigate("/signin");
       return;
@@ -57,7 +60,7 @@ const ProfilePage = () => {
   const toggleEditMode = () => setIsEditing(!isEditing);
 
   const handleSaveChanges = async () => {
-    const token = localStorage.getItem("token");
+    const {token} = useAuthStore();
     if (!token || token.length < 20) {
       navigate("/signin");
       return;

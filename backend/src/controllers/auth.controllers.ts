@@ -11,7 +11,7 @@ import { success } from 'zod';
 
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
-let token:string="";
+
 
 async function sendOTP (email:string,otp :string){
       await transporter.sendMail({
@@ -61,11 +61,11 @@ export const signup = async (req: express.Request, res: express.Response)=>{
       }
     })
 
-     token = generateToken(newUser.id,res);
+    //  token = generateToken(newUser.id,res);
 
      await sendOTP(email,otp);
 
-     res.status(201).json({ message: 'User registered. Please verify OTP sent to email.' ,user:newUser,token:token});
+     res.status(201).json({ message: 'User registered. Please verify OTP sent to email.',user:newUser});
 }
 
 
@@ -164,7 +164,7 @@ export const verifyOTP = async (req:express.Request, res:express.Response) => {
                 verficationTokenExpiresAt: null
             }
         });
-
+        const token = generateToken(user.id,res);
         res.json({ message: 'Email verified successfully. You can now log in.' ,success:"Success",token:token});
     } catch (error) {
         res.status(500).json({ message: 'Error verifying OTP', error });
@@ -225,21 +225,21 @@ export const signin = async(req:express.Request,res:express.Response)=>{
     });
 
     if (!user) {
-        return res.status(400).json({ errors: { email: ['User not found'] } });
+        return res.status(400).json({ errorMessage:'User not found' });
     }
 
     if (!user.isVerified) {
-      return res.status(400).json({ notVerified: 'Email not verified. Please verify OTP.' });
+      return res.status(400).json({ errorMessage: 'Email not verified. Please verify OTP.' });
     }
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
-        return res.status(400).json({ errors: { password: ['Invalid Credentials'] } });
+        return res.status(400).json({ errorMessage: 'Invalid Credentials' });
     }
 
     // now signin in actually
 
     const token = generateToken(user.id, res);
 
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ user, token ,success:success});
 };

@@ -8,36 +8,24 @@ import { useAuthStore } from "../store/authStore";
 
 
 function Navbar() {
- const { token, setToken } = useAuthStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
 
-      useEffect(() => {
-           const item = localStorage.getItem("token");
-          if (!item) return;
 
-         
-
-          if(token){
-            setToken(token);
-          }
-
-      }, [setToken]);
-
+  const {token,logout} =useAuthStore();
   const handleAuthClick = () => {
-    const token = localStorage.getItem("token");
 
     if (token) {
-      localStorage.removeItem("token");
+      logout();
       toast.success("Logged out successfully!");
-      setTimeout(() => {
-        navigate("/signin");
-      }, 1500);
-    } else {
-      navigate("/signin");
     }
+
+    navigate("/signin");
   };
+
+
+
 
   return (
 <nav className="fixed top-0 left-0 w-full h-20 bg-gradient-to-r from-gray-600 via-gray-800 to-black shadow-lg backdrop-blur-md z-50">      <div className="max-w-8xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -51,7 +39,7 @@ function Navbar() {
           {menuOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
         </div>
 
-        {/* 🌐 Desktop Menu */}
+        {/*Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 text-white font-semibold text-lg">
           <Link className="hover:text-yellow-200 hover:scale-110 transition-all duration-200" to="/add-paper">
             Add Paper
@@ -71,7 +59,7 @@ function Navbar() {
             onClick={handleAuthClick}
             className="ml-2 px-4 py-2 bg-white text-amber-600 rounded-full shadow-md font-semibold hover:bg-yellow-50 hover:shadow-lg transition-all duration-300"
           >
-            {localStorage.getItem("token") ? "Logout" : "Login"}
+            {token ? "Logout" : "Login"}
           </button>
 
           {/* 👤 Profile Icon */}

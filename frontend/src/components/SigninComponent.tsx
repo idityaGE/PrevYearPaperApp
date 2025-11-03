@@ -21,13 +21,14 @@ import { Label } from "../components/ui/label";
 import { useAuthStore } from "../store/authStore";
 
 export function SigninComponent() {
+  const {signin} = useAuthStore();
+
+  const [email,setEmail] = useState("");
+
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
 
-  // ✅ Correct way to use Zustand
-  const email = useAuthStore((state) => state.email);
-  const setEmail = useAuthStore((state) => state.setEmail);
-  const setToken = useAuthStore((state) => state.setToken);
+
 
   const handleSignin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,33 +37,25 @@ export function SigninComponent() {
         email,
         password,
       });
+      
+      signin(response.data.token, email!);
 
-      if(response.data.notVerified){
-        toast.error("Please verify your email");
-        return;
-      }
+    if(response.data.errorMessage){
+      toast.error(response.data.errorMessage);
+      return;
+    }
+
     if (!response.data.token) {
       toast.error("Error while signing in");
       return;
     }
 
-      const { token } = response.data;
-
-      // ✅ Update Zustand state
-      setToken(token);
-
-      // optional: update email in store
-      setEmail(email!);
-
-      // optional: save token manually to localStorage
-      localStorage.setItem("token", token);
-
-      toast.success("Login successful! Redirecting...");
-      setTimeout(() => navigate("/"), 1500);
+    toast.success("Login successful! Redirecting...");
+    setTimeout(() => navigate("/"), 1500);
     } catch (error: any) {
-      console.log(error.response?.data); // for debugging
+      console.log(error.response?.data.errorMessage); // for debugging
       const message =
-        error.response?.notVerified || // backend error message
+       error.response?.data.errorMessage || // backend error message
         error.message ||                 // network or other axios error
         "Something went wrong";
       toast.error(message);
