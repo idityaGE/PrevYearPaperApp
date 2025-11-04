@@ -33,7 +33,7 @@ const InputField = ({ label, name, type = "text", placeholder, value, onChange, 
         placeholder={placeholder || label}
         value={value}
         onChange={onChange}
-        className="w-full p-3 text-base text-white placeholder-gray-500 bg-black border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200 resize-none"
+        className="border-white w-full p-3 text-base text-white placeholder-white bg-black border  rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200 resize-none"
       ></textarea>
     ) : (
       <input
@@ -43,7 +43,7 @@ const InputField = ({ label, name, type = "text", placeholder, value, onChange, 
         placeholder={placeholder || label}
         value={value}
         onChange={onChange}
-        className="w-full p-3 text-base text-white placeholder-gray-500 bg-black border border-white/20 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200"
+        className="w-full p-3 text-base text-white placeholder-white bg-black border border-white rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200"
       />
     )}
   </div>
@@ -165,7 +165,7 @@ function Contact() {
 
           {/* Right Form Panel */}
           <div className="flex justify-center items-center p-4 sm:p-12">
-            <div className="w-full max-w-md p-8 sm:p-10 border border-white/10 rounded-xl">
+          <div className="w-full max-w-md p-8 sm:p-10  border rounded-xl shadow-lg">
               {successMessage && (
                 <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
                   {successMessage}

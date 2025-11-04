@@ -40,7 +40,6 @@ export function InputOTPForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const otp: string = data.pin;
-      console.log(typeof otp,"=",otp);
       
         const res = await axios.post("http://localhost:3000/api/auth/verify-otp", {
           email:userEmail,

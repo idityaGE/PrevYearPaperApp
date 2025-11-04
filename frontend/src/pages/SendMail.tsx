@@ -15,7 +15,6 @@ function SendMail() {
     }
 
     // Replace this with actual email sending API
-    console.log("Send email to:", email);
 
     const response =await axios.post('http://localhost:3000/api/auth/send-email',{email});
 

@@ -8,46 +8,30 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
   try {
     const { dept, program, sem, subject, examType, year } = req.body;
 
-    const where: any = {
-      isVerified: true,
-    };
+    const where: any = { isVerified: true };
 
-    if (examType) {
-      where.type = examType as PaperType;
+    if (examType) where.type = examType as PaperType;
+    if (year) where.year = Number(year);
+
+    where.subject = {};
+
+    if (subject) where.subject.name = subject;
+
+    if (sem) {
+      where.subject.semester = {
+        number: Number(sem)
+      };
     }
 
-    if (year) {
-      where.year = Number(year); // ✅ Filter by year
+    if (program) {
+      where.subject.semester = where.subject.semester || {};
+      where.subject.semester.program = { name: program };
     }
 
-    if (subject || sem || program || dept) {
-      where.subject = {};
-
-      if (subject) {
-        where.subject.name = subject;
-      }
-
-      if (sem || program || dept) {
-        where.subject.semester = {};
-
-        if (sem) {
-          where.subject.semester.number = Number(sem);
-        }
-
-        if (program || dept) {
-          where.subject.semester.program = {};
-
-          if (program) {
-            where.subject.semester.program.name = program;
-          }
-
-          if (dept) {
-            where.subject.semester.program.department = {
-              name: dept,
-            };
-          }
-        }
-      }
+    if (dept) {
+      where.subject.semester = where.subject.semester || {};
+      where.subject.semester.program = where.subject.semester.program || {};
+      where.subject.semester.program.department = { name: dept };
     }
 
     const papers = await client.paper.findMany({
@@ -57,11 +41,7 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
           include: {
             semester: {
               include: {
-                program: {
-                  include: {
-                    department: true,
-                  },
-                },
+                program: { include: { department: true } },
               },
             },
           },
@@ -75,6 +55,7 @@ export const getPapers = async (req: express.Request, res: express.Response) => 
     res.status(500).json({ error: "Something went wrong!" });
   }
 };
+
 
 
 
@@ -97,8 +78,6 @@ export const addPapers = async (req:express.Request, res:express.Response) => {
     year = Number(year);
     const response = paperValidation.safeParse({ department, program, semester, subject, type, year });
     if(!response.success){
-      console.log("validation fail");
-      console.log(response.error.issues);
       
       return res.json({
         message:response.error.issues
@@ -174,7 +153,7 @@ export const addPapers = async (req:express.Request, res:express.Response) => {
       },
     });
 
-    res.status(201).json({ message: "Paper submitted ✅", paper });
+    res.status(201).json({ message: "Paper submitted", paper });
 
   } catch (error) {
     console.error(" Error adding paper:", error);

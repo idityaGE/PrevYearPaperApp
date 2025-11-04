@@ -40,7 +40,6 @@ export const getPendingPapers = async (req, res) => {
 export const verfyPaperById = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log(id);
         const updated = await client.paper.update({
             where: { id: Number(id) },
             data: { isVerified: true },

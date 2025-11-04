@@ -1,13 +1,14 @@
 import { Router } from "express";
 import client from "../lib/initClient.js";
 import { getPendingPapers, verfyPaperById } from "../controllers/admin.controllers.js";
+import adminMiddleware from "../middleware/admin.js";
 const adminRouter = Router();
 // adminRouter.post('/signup',(req,res)=>{
 //     const {name,email,password} = req.body;
 // })
-adminRouter.get("/pending-papers", getPendingPapers);
-adminRouter.patch("/verify-paper/:id", verfyPaperById);
-adminRouter.delete('/paper/:id', async (req, res) => {
+adminRouter.get("/pending-papers", adminMiddleware, getPendingPapers);
+adminRouter.patch("/verify-paper/:id", adminMiddleware, verfyPaperById);
+adminRouter.delete('/paper/:id', adminMiddleware, async (req, res) => {
     // try {
     //   const {id} = req.params;
     //   //delete paper with the given id
@@ -24,7 +25,7 @@ adminRouter.delete('/paper/:id', async (req, res) => {
     //   res.status(500).json({ error: "Internal server error" });
     // }
 });
-adminRouter.put('/paper/:id', async (req, res) => {
+adminRouter.put('/paper/:id', adminMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         const { type, year } = req.body;
@@ -42,7 +43,7 @@ adminRouter.put('/paper/:id', async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-adminRouter.get('/queries', async (req, res) => {
+adminRouter.get('/queries', adminMiddleware, async (req, res) => {
     try {
         const queries = await client.query.findMany({
             where: {
@@ -68,7 +69,7 @@ adminRouter.get('/queries', async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-adminRouter.put('/resolve-query/:id', async (req, res) => {
+adminRouter.put('/resolve-query/:id', adminMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         await client.query.update({

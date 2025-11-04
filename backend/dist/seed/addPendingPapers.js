@@ -1,7 +1,6 @@
 import { PrismaClient, PaperType } from "../../generated/prisma/index.js";
 const prisma = new PrismaClient();
 async function main() {
-    console.log("📄 Adding 20 pending papers...");
     // Departments to target
     const targetDepartments = [
         "Artificial Intelligence",
@@ -55,7 +54,7 @@ async function main() {
             fileUrl: `https://pending-papers.com/${subject?.code}_${type?.toLowerCase()}_${2020 + (i % 5)}.pdf`,
             subjectId: subject?.id,
             uploadedBy: uploader?.id,
-            isVerified: false, // ❌ Pending
+            isVerified: false,
         });
     }
     // Insert all pending papers
@@ -66,7 +65,7 @@ async function main() {
 }
 main()
     .catch((e) => {
-    console.error("❌ Error adding pending papers", e);
+    console.error(" Error adding pending papers", e);
     process.exit(1);
 })
     .finally(async () => {

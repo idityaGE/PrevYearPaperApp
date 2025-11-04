@@ -60,12 +60,14 @@ const ProfilePage = () => {
   const toggleEditMode = () => setIsEditing(!isEditing);
 
   const handleSaveChanges = async () => {
-    const {token} = useAuthStore();
     if (!token || token.length < 20) {
       navigate("/signin");
       return;
     }
 
+
+    console.log(profilePic);
+    
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -159,7 +161,10 @@ const ProfilePage = () => {
                 className="w-full mt-1 p-3 rounded-lg bg-white/5 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">{bio}</p>
+            <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
+              {bio && bio.trim() !== "" ? bio : "No bio available"}
+            </p>
+
             )}
           </div>
 
@@ -175,7 +180,9 @@ const ProfilePage = () => {
                 />
               </Suspense>
             ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">{twitterHandle}</p>
+              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
+              {twitterHandle && twitterHandle.trim() !== "" ? twitterHandle : "No bio available"}
+            </p>
             )}
 
             <label className="text-sm text-gray-300 mt-4 block">LinkedIn</label>
@@ -188,7 +195,9 @@ const ProfilePage = () => {
                 />
               </Suspense>
             ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">{linkedinProfile}</p>
+          <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
+            {linkedinProfile && linkedinProfile.trim() !== "" ? linkedinProfile : "No bio available"}
+          </p>
             )}
           </div>
         </div>

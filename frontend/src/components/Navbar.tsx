@@ -92,14 +92,17 @@ function Navbar() {
           </Link>
 
           <button
-            onClick={() => {
-              setMenuOpen(false);
-              handleAuthClick();
-            }}
-            className="px-5 py-2 bg-white text-amber-600 rounded-full font-semibold hover:bg-yellow-50 transition-all duration-300"
-          >
-            { token ? "Logout" : "Login"}
-          </button>
+        onClick={() => {
+          setMenuOpen(false);
+          handleAuthClick();
+        }}
+        className="px-5 py-2 bg-white text-amber-600 rounded-full font-semibold 
+                  hover:bg-yellow-50 transition-all duration-300 
+                  active:bg-amber-100 active:text-amber-700"
+      >
+        {token ? "Logout" : "Login"}
+      </button>
+
 
           <Link to="/profile" onClick={() => setMenuOpen(false)}>
             <img

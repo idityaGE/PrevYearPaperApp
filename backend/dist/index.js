@@ -24,8 +24,6 @@ app.use(cors({
     },
     credentials: true
 }));
-console.log(process.env.DATABASE_URL);
-console.log(process.env.CLOUDINARY_CLOUD_NAME);
 // Limit body size to 5 MB for JSON and URL-encoded data
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));

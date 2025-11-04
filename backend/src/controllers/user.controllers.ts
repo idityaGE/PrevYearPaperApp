@@ -5,7 +5,6 @@ import zod from 'zod';
 
 export const userProfile = async (req:express.Request, res:express.Response) => {
    const { id } = req.user as any;
-   console.log(id);
    
    try {
     const userProfile = await client.user.findUnique({
@@ -20,7 +19,6 @@ export const userProfile = async (req:express.Request, res:express.Response) => 
         twitter: true,
       },
     });
-    console.log(userProfile);
     
     res.json(userProfile);
    } catch (error) {

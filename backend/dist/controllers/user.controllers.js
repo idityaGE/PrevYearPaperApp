@@ -4,7 +4,6 @@ import cloudinary from "../utils/cloudinary.js";
 import zod from 'zod';
 export const userProfile = async (req, res) => {
     const { id } = req.user;
-    console.log(id);
     try {
         const userProfile = await client.user.findUnique({
             where: { id: Number(id) },
@@ -18,7 +17,6 @@ export const userProfile = async (req, res) => {
                 twitter: true,
             },
         });
-        console.log(userProfile);
         res.json(userProfile);
     }
     catch (error) {

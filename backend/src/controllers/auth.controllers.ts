@@ -23,7 +23,7 @@ async function sendOTP (email:string,otp :string){
 }
 export const signup = async (req: express.Request, res: express.Response)=>{
 
-  const { name, email, password } = req.body;
+    const { name, email, password } = req.body;
     const validation = signUpValidation.safeParse(req.body);
 
     if (!validation.success) {
@@ -39,7 +39,7 @@ export const signup = async (req: express.Request, res: express.Response)=>{
 
     
     if(user){
-      res.status(400).json({ errors: { email: ['User already exists'] } });
+      res.status(400).json({ errors: 'User already exists with this Email' });
       return;
     }
 
@@ -62,6 +62,7 @@ export const signup = async (req: express.Request, res: express.Response)=>{
     })
 
     //  token = generateToken(newUser.id,res);
+
 
      await sendOTP(email,otp);
 
@@ -215,7 +216,7 @@ export const signin = async(req:express.Request,res:express.Response)=>{
     const validation = signinValidation.safeParse(req.body);  
 
     if(!validation.success){
-        return res.status(400).json({ errors: validation.error.flatten().fieldErrors });
+        return res.status(400).json({ errors: "Incorrect Inputs" });
     }
 
     const user = await client.user.findUnique({
@@ -233,6 +234,7 @@ export const signin = async(req:express.Request,res:express.Response)=>{
     }
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
+
     if (!isPasswordValid) {
         return res.status(400).json({ errorMessage: 'Invalid Credentials' });
     }
@@ -242,4 +244,5 @@ export const signin = async(req:express.Request,res:express.Response)=>{
     const token = generateToken(user.id, res);
 
     return res.status(200).json({ user, token ,success:success});
+
 };

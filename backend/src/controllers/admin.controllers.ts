@@ -45,7 +45,6 @@ export const getPendingPapers = async (req:express.Request, res:express.Response
 export const verfyPaperById = async (req:express.Request, res:express.Response) => {
   try {
     const { id } = req.params;
-    console.log(id);
     
     const updated = await client.paper.update({
       where: { id: Number(id) },

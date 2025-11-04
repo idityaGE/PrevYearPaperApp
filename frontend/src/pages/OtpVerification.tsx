@@ -8,8 +8,7 @@ function OtpVerification() {
 
   const resendHandler = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/api/auth/resend-otp', { email });
-      console.log('OTP resent successfully:', res.data);
+      await axios.post('http://localhost:3000/api/auth/resend-otp', { email });
       toast.success('A new OTP has been sent to your email!');
     } catch (error) {
       console.error('Error resending OTP:', error);

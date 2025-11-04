@@ -28,7 +28,7 @@ export const signup = async (req, res) => {
         }
     });
     if (user) {
-        res.status(400).json({ errors: { email: ['User already exists'] } });
+        res.status(400).json({ errors: 'User already exists with this Email' });
         return;
     }
     //create a new user 
@@ -158,7 +158,7 @@ export const signin = async (req, res) => {
     const { email, password } = req.body;
     const validation = signinValidation.safeParse(req.body);
     if (!validation.success) {
-        return res.status(400).json({ errors: validation.error.flatten().fieldErrors });
+        return res.status(400).json({ errors: "Incorrect Inputs" });
     }
     const user = await client.user.findUnique({
         where: {

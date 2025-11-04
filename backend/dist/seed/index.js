@@ -106,14 +106,13 @@ async function main() {
             }
         }
     }
-    console.log("✅ Papers inserted only for selected departments (Computer Science excluded).");
 }
 main()
     .then(() => {
-    console.log("🎉 Seed complete.");
+    console.log("Seed complete.");
 })
     .catch((e) => {
-    console.error("❌ Error during seed:", e);
+    console.error(" Error during seed:", e);
     process.exit(1);
 })
     .finally(async () => {

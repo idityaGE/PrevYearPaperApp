@@ -8,7 +8,9 @@ function PendingQueries() {
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/admin/queries");
+        const response = await axios.get("http://localhost:3000/api/admin/queries",{
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
         setAllQueries(response.data);
       } catch (err) {
         console.error(err);

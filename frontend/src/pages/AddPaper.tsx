@@ -10,8 +10,11 @@ const InputBox = lazy(() => import("../components/InputBox"));
 
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useAuthStore } from "../store/authStore";
+import Button from "@mui/joy/Button";
+import {  Loader2 } from "lucide-react";
+import FileInputBox from "../components/FileInputBox";
 
 export default function AddPaper() {
   const {token} = useAuthStore();
@@ -24,12 +27,13 @@ export default function AddPaper() {
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
-
   const [selectedExamType, setSelectedExamType] = useState<string>("");
+  const [loading,setLoading] = useState(false);
 
 
-  const handleFileChange = (e: any) => {
-    setFile(e.target.files[0]);
+
+  const handleFileChange = (file: File | null) => {
+    setFile(file);
   };
 
 const departments = useMemo(() => universityData.map(d => d.department), []);
@@ -45,9 +49,10 @@ const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [sem
 
 
   const handleSubmit = async () => {
-
-    console.log(selectedDept,selectedExamType,selectedProgram,selectedSemester,selectedSubject,selectedYear);
+    console.log(file);
+    console.log(selectedDept,selectedExamType,selectedProgram,selectedSubject,selectedYear);
     
+    setLoading(true);
   try {
     if (!token || token.length < 20) {
       return navigate("/signin");
@@ -66,7 +71,6 @@ const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [sem
       return;
     }
 
-    // ✅ Step 1: Create FormData with all fields + file
     const formData = new FormData();
     formData.append("department", selectedDept);
     formData.append("program", selectedProgram);
@@ -76,7 +80,6 @@ const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [sem
     formData.append("semester", String(Number(selectedSemester)));
     formData.append("file", file);
 
-    //  Step 2: Make a single request to add paper (file + data together)
     const response = await axios.post(
       "http://localhost:3000/api/user/add-paper",
       formData,
@@ -88,15 +91,25 @@ const subjects = useMemo(() => semesterList.flatMap(s => s.subjects) || [], [sem
       }
     );
 
+    
     if (response.status === 201) {
-      toast.success("✅ Paper submitted for verification!");
+      toast.success(" Paper submitted for verification!");
       navigate("/");
-    } else {
+    } 
+    else if(response.data.error){
+      toast.error(response.data.error);
+    }
+    else {
       toast.error("Something went wrong while adding the paper!");
     }
+
   } catch (error: any) {
-    console.error(error);
-    toast.error(error.response?.data?.error || "Failed to add paper!");
+    console.error(error.response.data.error);
+    // toast.error("dmsioad")
+    toast.error(error.response.data.error || "Failed to add paper!");
+  }
+  finally{
+    setLoading(false);
   }
 };
 
@@ -171,24 +184,38 @@ return (
           <SelectButton placeholder="Select Year" options={years.map(String)} onChange={(val) => setSelectedYear(val)} value={selectedYear} />
           <SelectButton placeholder="Select Semester" options={semesters.map(String)} onChange={(val) => setSelectedSemester(val)} value={selectedSemester} />
 
-          <InputBox
+          <FileInputBox
+            name="Upload Your Paper"
             type="file"
-            placeholder="Choose Paper File"
-            onChange={handleFileChange}
             accept=".pdf,.jpg,.png"
+            onChange={handleFileChange}
           />
+          
           
         </Suspense>
 
-        {/* Submit Button */}
-        <button
+            {/* Submit Button */}
+    <Button
           onClick={handleSubmit}
-          className="mt-6 w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:scale-105 hover:shadow-indigo-400/30 transition-all duration-300"
+          disabled={loading}
+          className={`mt-6 w-full py-6 font-semibold rounded-xl shadow-lg transition-all duration-300 
+          bg-gradient-to-r from-indigo-500 to-purple-600 text-white 
+          hover:scale-105 hover:shadow-indigo-400/30
+          ${loading ? "cursor-not-allowed opacity-90 hover:scale-100" : ""}`}
         >
-          🚀 Upload Paper
-        </button>
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin h-5 w-5" />
+              Uploading...
+            </div>
+          ) : (
+            " Upload Paper"
+          )}
+        </Button>
       </div>
     </div>
+    <ToastContainer position="top-right" autoClose={3000} />
+
   </div>
 );
 

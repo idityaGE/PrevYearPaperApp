@@ -14,6 +14,7 @@ import SendMail from "./pages/SendMail";
 import Demo from "./pages/Demo";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const { signin,token }  = useAuthStore();
@@ -34,18 +35,33 @@ function App() {
 
       <div className="pt-20 bg-black min-h-screen text-white">
         <Routes>
-           <Route path="/demo" element={<Demo />} />
+          <Route path="/demo" element={<Demo />} />
           <Route path="/" element={<DashBoard />} />
           <Route path="/signup" element={<SignupPageComponent />} />
           <Route path="/signin" element={<SigninPageComponent />} />
           <Route path="/email-verification" element={<OtpVerification />} />
-          <Route path="/contact" element={token? <Contact />:<SigninPageComponent/>} />
+          <Route path="/contact" element={<ProtectedRoute token={token}><Contact/></ProtectedRoute>} />
           <Route path="/features" element={<Features />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/send-otp" element={<SendMail />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/add-paper" element={token ? <AddPaper /> : <SigninPageComponent />} />
-          <Route path="/profile" element={token ? <ProfilePage /> : <SigninPageComponent />} />
+
+          <Route
+           path="/add-paper" 
+           element={
+            <ProtectedRoute token={token}>
+              <AddPaper/>
+            </ProtectedRoute>} />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute token={token}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+        />
+
         </Routes>
       </div>
     </BrowserRouter>

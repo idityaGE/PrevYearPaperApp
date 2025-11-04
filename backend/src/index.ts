@@ -1,5 +1,5 @@
 import express from 'express';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -28,10 +28,9 @@ app.use(cors({
   credentials: true
 }));
 
-console.log(process.env.DATABASE_URL);
-console.log(process.env.CLOUDINARY_CLOUD_NAME);
 
 // Limit body size to 5 MB for JSON and URL-encoded data
+
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
@@ -41,13 +40,18 @@ app.use("/api", generalLimiter);
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', paperRouter);
+
+
 app.use('/api/admin', adminRouter);
 app.use('/api', uploadRouter);
+
 
 app.get('/check', (req, res) => {
   res.send('Check route is working');
 });
 
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
