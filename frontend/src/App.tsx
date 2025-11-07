@@ -17,7 +17,7 @@ import { useAuthStore } from "./store/authStore";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const { signin,token }  = useAuthStore();
+  const { signin }  = useAuthStore();
   useEffect(()=>{
      const token = localStorage.getItem('token');
       const email = localStorage.getItem('email');
@@ -40,7 +40,7 @@ function App() {
           <Route path="/signup" element={<SignupPageComponent />} />
           <Route path="/signin" element={<SigninPageComponent />} />
           <Route path="/email-verification" element={<OtpVerification />} />
-          <Route path="/contact" element={<ProtectedRoute token={token}><Contact/></ProtectedRoute>} />
+          <Route path="/contact" element={<ProtectedRoute ><Contact/></ProtectedRoute>} />
           <Route path="/features" element={<Features />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/send-otp" element={<SendMail />} />
@@ -49,14 +49,14 @@ function App() {
           <Route
            path="/add-paper" 
            element={
-            <ProtectedRoute token={token}>
+            <ProtectedRoute>
               <AddPaper/>
             </ProtectedRoute>} />
 
           <Route
             path="/profile"
             element={
-              <ProtectedRoute token={token}>
+              <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
             }

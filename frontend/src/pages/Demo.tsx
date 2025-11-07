@@ -1,4 +1,3 @@
-import React from 'react'
 import { PaginationDemo } from '../components/PaginationDemo'
 
 function Demo() {

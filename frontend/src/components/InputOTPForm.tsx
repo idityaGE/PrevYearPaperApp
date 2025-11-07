@@ -25,7 +25,7 @@ const FormSchema = z.object({
 })
 
 export function InputOTPForm() {
-  const [ searchParams,setSearchParams] = useSearchParams();
+  const [ searchParams] = useSearchParams();
   const { signin} = useAuthStore();
 
   const userEmail = searchParams.get('email');
