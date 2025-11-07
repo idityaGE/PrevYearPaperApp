@@ -1,6 +1,6 @@
 import { Router } from "express";
 import client from "../lib/initClient.js";
-import { getPendingPapers, verfyPaperById } from "../controllers/admin.controllers.js";
+import { addDepartment, getPendingPapers, verfyPaperById } from "../controllers/admin.controllers.js";
 import adminMiddleware from "../middleware/admin.js";
 
 const adminRouter = Router();
@@ -12,6 +12,8 @@ const adminRouter = Router();
 adminRouter.get("/pending-papers",adminMiddleware,getPendingPapers);
 
 adminRouter.patch("/verify-paper/:id",adminMiddleware,verfyPaperById);
+
+adminRouter.post("add-department",adminMiddleware,addDepartment);
 
 adminRouter.delete('/paper/:id',adminMiddleware,async(req,res)=>{
   // try {

@@ -1,136 +1,92 @@
-import { PrismaClient, PaperType, Role } from '../../generated/prisma/index.js';
 
-const prisma = new PrismaClient();
+// import { PrismaClient } from "../../generated/prisma/index.js";
+// import { universityData } from "./universityData.js";
 
-async function main() {
-  // ---- 1) Clear old data (be careful on prod!)
-  await prisma.paper.deleteMany();
-  await prisma.subject.deleteMany();
-  await prisma.semester.deleteMany();
-  await prisma.program.deleteMany();
-  await prisma.department.deleteMany();
-  await prisma.user.deleteMany();
+// const prisma = new PrismaClient();
 
-  // ---- 2) Create users
-  const admin = await prisma.user.create({
-    data: {
-      name: "Admin User",
-      email: "admin@example.com",
-      password: "hashedpassword",
-      role: Role.ADMIN,
-    },
-  });
+// async function main() {
+//   console.log("🧹 Clearing old data...");
 
-  const student = await prisma.user.create({
-    data: {
-      name: "Student User",
-      email: "student@example.com",
-      password: "hashedpassword",
-      role: Role.USER,
-    },
-  });
+//   // Delete in reverse order of dependencies
+//   await prisma.subject.deleteMany();
+//   await prisma.semester.deleteMany();
+//   await prisma.program.deleteMany();
+//   await prisma.department.deleteMany();
 
-  // ---- 3) Department list (all departments will be created)
-  const allDepartments = [
-    "Computer Science", "Mathematics", "Physics", "Chemistry",
-    "Mechanical Engg", "Civil Engg", "Electrical Engg", "Electronics",
-    "Biotechnology", "Information Technology", "Aerospace Engg",
-    "Automobile Engg", "Artificial Intelligence", "Data Science",
-    "Robotics", "Economics", "Statistics", "Commerce",
-    "Management", "Architecture",
-  ];
+//   console.log("📥 Inserting department, program, semester, and subject data...");
 
-  // Create all department rows first
-  const deptMap: Record<string, { id: number }> = {};
-  for (const name of allDepartments) {
-    const d = await prisma.department.create({ data: { name } });
-    deptMap[name] = d;
-  }
+//   for (const dept of universityData) {
+//     try {
+//       // Create department
+//       const createdDept = await prisma.department.create({
+//         data: { name: dept.department },
+//       });
+//       console.log(`✅ Inserted Department: ${createdDept.name}`);
 
-  // ---- 4) Which departments will actually get papers inserted?
-  // Remove "Computer Science" from this array to skip papers for CSE.
-  const departmentsWithPapers = allDepartments.filter((d) => d !== "Computer Science");
+//       for (const program of dept.programs) {
+//         try {
+//           // Create program
+//           const createdProgram = await prisma.program.create({
+//             data: {
+//               name: program.name,
+//               departmentId: createdDept.id,
+//             },
+//           });
+//           console.log(`   ➤ Inserted Program: ${createdProgram.name}`);
 
-  // ---- 5) Create programs / semesters / subjects for ALL departments
-  // (Important: create programs/semesters/subjects for every department,
-  //  but insert papers only for departmentsWithPapers)
-  for (const deptName of allDepartments) {
-    const dept = deptMap[deptName];
+//           for (const sem of program.semesters) {
+//             try {
+//               // Create semester
+//               const createdSem = await prisma.semester.create({
+//                 data: {
+//                   number: sem.number,
+//                   programId: createdProgram.id,
+//                 },
+//               });
+//               console.log(`      • Inserted Semester: ${createdSem.number}`);
 
-    // create 2 programs for each dept (you can change counts as needed)
-    for (let p = 1; p <= 2; p++) {
-      const program = await prisma.program.create({
-        data: {
-          name: `Program ${p} of ${deptName}`,
-          departmentId: dept!.id,
-          // create 5 semesters per program
-          semesters: {
-            create: Array.from({ length: 5 }, (_, i) => ({ number: i + 1 }))
-          }
-        }
-      });
+//               // Prepare subjects for batch insert
+//               if (sem.subjects.length > 0) {
+//                 const subjectData = sem.subjects.map((name) => ({
+//                   name,
+//                   semesterId: createdSem.id,
+//                 }));
 
-      // fetch the created semesters to attach subjects
-      const semesters = await prisma.semester.findMany({ where: { programId: program.id } });
+//                 await prisma.subject.createMany({
+//                   data: subjectData,
+//                 });
 
-      for (const sem of semesters) {
-        // create 3 subjects per semester
-        for (let s = 1; s <= 3; s++) {
-          await prisma.subject.create({
-            data: {
-              name: `${deptName} Subject ${s} - Sem ${sem.number}`,
-              code: `${deptName.substring(0, 3).toUpperCase()}${sem.number}0${s}`,
-              semesterId: sem.id
-            }
-          });
-        }
-      }
-    }
-  }
+//                 // Log subjects inserted
+//                 subjectData.forEach((subj) => {
+//                   console.log(`         - Inserted Subject: ${subj.name}`);
+//                 });
+//               }
+//             } catch (semErr) {
+//               console.error(
+//                 ` Error inserting Semester ${sem.number} of Program ${program.name}:`,
+//                 semErr
+//               );
+//             }
+//           }
+//         } catch (programErr) {
+//           console.error(
+//             `Error inserting Program ${program.name} in Department ${dept.department}:`,
+//             programErr
+//           );
+//         }
+//       }
+//     } catch (deptErr) {
+//       console.error(` Error inserting Department ${dept.department}:`, deptErr);
+//     }
+//   }
 
-  console.log("✅ Departments, programs, semesters and subjects created for ALL departments.");
+//   console.log("🎉 All data insertion complete!");
+// }
 
-  // ---- 6) Now insert papers ONLY for the selected departments (exclude Computer Science)
-  for (const deptName of departmentsWithPapers) {
-    // Get programs of this department
-    const programs = await prisma.program.findMany({
-      where: { departmentId: deptMap[deptName]!.id },
-      include: { semesters: { include: { subjects: true } } }
-    });
-
-    for (const prog of programs) {
-      for (const sem of prog.semesters) {
-        for (const subj of sem.subjects) {
-          // Create 6 papers per subject (3 paper types × 2 years)
-          for (const type of [PaperType.CIA_I, PaperType.CIA_II, PaperType.END_SEM]) {
-            for (let k = 1; k <= 2; k++) {
-              await prisma.paper.create({
-                data: {
-                  type,
-                  year: 2021 + (k % 3), // samples: 2021..2023
-                  fileUrl: `https://dummy-papers.com/${subj.code}_${type.toLowerCase()}_${2021 + (k % 3)}.pdf`,
-                  subjectId: subj.id,
-                  uploadedBy: Math.random() > 0.5 ? admin.id : student.id,
-                  isVerified: Math.random() > 0.5, // random verified
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-  }
-
-}
-
-main()
-  .then(() => {
-    console.log("Seed complete.");
-  })
-  .catch((e) => {
-    console.error(" Error during seed:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// main()
+//   .catch((err) => {
+//     console.error(" Unexpected error:", err);
+//   })
+//   .finally(async () => {
+//     await prisma.$disconnect();
+//   });

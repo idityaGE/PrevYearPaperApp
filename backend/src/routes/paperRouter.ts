@@ -16,7 +16,7 @@ import { getQueryById } from "../controllers/admin.controllers.js";
 import { contactLimiter, uploadPaperLimiter } from "../utils/rateLimit.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
-const uploadRouter = express.Router();
+// const uploadRouter = express.Router();
 
 
 

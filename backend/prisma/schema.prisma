@@ -16,17 +16,21 @@ datasource db {
 
 model Department {
   id      Int       @id @default(autoincrement())
-  name    String
+  name    String  @unique
   program Program[]
 }
 
 model Program {
   id           Int        @id @default(autoincrement())
-  name         String     @unique
+  name         String
+
   departmentId Int
   department   Department @relation(fields: [departmentId], references: [id])
   semesters    Semester[]
+
+  @@unique([name, departmentId]) 
 }
+
 
 model Semester {
   id        Int       @id @default(autoincrement())
@@ -39,7 +43,6 @@ model Semester {
 model Subject {
   id         Int      @id @default(autoincrement())
   name       String
-  code       String?
   semesterId Int
   semester   Semester @relation(fields: [semesterId], references: [id])
   papers     Paper[]
@@ -102,12 +105,13 @@ enum Role {
 model Query {
   id           Int      @id @default(autoincrement())
   message      String
+  subject       String
   userId       Int?
   user         User?    @relation(fields: [userId], references: [id])
 
-  response     String?        // Admin's reply (nullable until replied)
-  respondedAt  DateTime?      // When the admin responded
-  adminId      Int?           // Admin who responded
+  response     String?       
+  respondedAt  DateTime?      
+  adminId      Int?         
   admin        User?          @relation("AdminResponses", fields: [adminId], references: [id])
 
   isResponded  Boolean  @default(false)

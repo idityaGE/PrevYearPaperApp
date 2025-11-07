@@ -71,92 +71,178 @@ const paperValidation = zod.object({
 
 
 
-export const addPapers = async (req:express.Request, res:express.Response) => {
+// export const addPapers = async (req:express.Request, res:express.Response) => {
+//   try {
+//     let { department, program, semester, subject, type, year } = req.body;
+//     semester = Number(semester);
+//     year = Number(year);
+
+//     console.log(department,program,semester,subject,type);
+    
+//     const response = paperValidation.safeParse({ department, program, semester, subject, type, year });
+//     if(!response.success){
+      
+//       return res.json({
+//         message:response.error.issues
+//       })
+//     }
+//     const dept = await client.department.findFirst({ where: { name: department } });
+//     if (!dept) return res.status(404).json({ error: "Department not found" });
+
+//     const dbProgram = await client.program.findFirst({
+//       where: { name:program, departmentId: dept.id },
+//     });
+//     if (!dbProgram) return res.status(404).json({ error: "Program not found" });
+
+//     const dbSemester = await client.semester.findFirst({
+//       where: { number: semester, programId: program.id },
+//     });
+//     if (!dbSemester) return res.status(404).json({ error: "Semester not found" });
+
+//     const dbSubject = await client.subject.findFirst({
+//       where: { name: subject, semesterId: semester.id },
+//     });
+//     if (!dbSubject) return res.status(404).json({ error: "Subject not found" });
+
+//     const isExistPaper = await client.paper.findFirst({
+//       where: {
+//         type: type,
+//         year: year,
+//         subjectId: subject.id, 
+//       },
+//     });
+
+
+//     if (isExistPaper) {
+//       return res.status(400).json({ error: "Paper already exists for this subject, year, and type" });
+//     }
+
+//       if (!req.file) {
+//           return res.status(400).json({ error: "No file uploaded" });
+//       }
+
+//       const bufferStream = new Readable();
+//       bufferStream.push(req.file.buffer);
+//       bufferStream.push(null);
+
+//       const uploadResult = await new Promise<{ secure_url: string }>((resolve, reject) => {
+//             const stream = cloudinary.uploader.upload_stream(
+//               { resource_type: "auto", folder: "papers" }, 
+//               (error:any, result:any) => {
+//                 if (error || !result) {
+//                   reject(error || new Error("Upload failed"));
+//                 } else {
+//                   resolve(result as { secure_url: string });
+//                 }
+//               }
+//             );
+    
+//             bufferStream.pipe(stream);
+//           });
+    
+//           const fileUrl = uploadResult.secure_url;
+
+  
+//     const paper = await client.paper.create({
+//       data: {
+//         type,
+//         year,
+//         fileUrl,
+//         subjectId: dbSubject.id,
+//         uploadedBy: req.user?.id|| null,
+//         isVerified: false,
+//       },
+//     });
+
+//     res.status(201).json({ message: "Paper submitted", paper });
+
+//   } catch (error) {
+//     console.error(" Error adding paper:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// }
+export const addPapers = async (req: express.Request, res: express.Response) => {
   try {
-     let { department, program, semester, subject, type, year } = req.body;
+    let { department, program, semester, subject, type, year } = req.body;
     semester = Number(semester);
     year = Number(year);
-    const response = paperValidation.safeParse({ department, program, semester, subject, type, year });
-    if(!response.success){
-      
-      return res.json({
-        message:response.error.issues
-      })
+
+    console.log("Incoming paper data:", { department, program, semester, subject, type, year });
+
+    // ✅ Validate input
+    const validation = paperValidation.safeParse({ department, program, semester, subject, type, year });
+    if (!validation.success) {
+      return res.status(400).json({ message: validation.error.issues });
     }
-    // Step 1: Find department, program, semester, subject (same as before)
-    const dept = await client.department.findFirst({ where: { name: department } });
-    if (!dept) return res.status(404).json({ error: "Department not found" });
+
+    // ✅ Verify department → program → semester → subject hierarchy
+    const dbDept = await client.department.findFirst({ where: { name: department } });
+    if (!dbDept) return res.status(404).json({ error: "Department not found" });
 
     const dbProgram = await client.program.findFirst({
-      where: { name:program, departmentId: dept.id },
+      where: { name: program, departmentId: dbDept.id },
     });
     if (!dbProgram) return res.status(404).json({ error: "Program not found" });
 
     const dbSemester = await client.semester.findFirst({
-      where: { number: semester, programId: program.id },
+      where: { number: semester, programId: dbProgram.id },
     });
     if (!dbSemester) return res.status(404).json({ error: "Semester not found" });
 
     const dbSubject = await client.subject.findFirst({
-      where: { name: subject, semesterId: semester.id },
+      where: { name: subject, semesterId: dbSemester.id },
     });
     if (!dbSubject) return res.status(404).json({ error: "Subject not found" });
 
-    //if there is a paper which is already present then not save it show error for user paper already exist
     const isExistPaper = await client.paper.findFirst({
-      where: {
-        type: type,
-        year: year,
-        subjectId: subject.id, 
-      },
+      where: { type, year, subjectId: dbSubject.id },
     });
-
-
     if (isExistPaper) {
       return res.status(400).json({ error: "Paper already exists for this subject, year, and type" });
     }
 
-    if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-      const bufferStream = new Readable();
-      bufferStream.push(req.file.buffer);
-      bufferStream.push(null);
+    const mimeType = req.file.mimetype;
+    let resourceType: "image" | "raw" | "auto" = "auto";
 
-        const uploadResult = await new Promise<{ secure_url: string }>((resolve, reject) => {
-              const stream = cloudinary.uploader.upload_stream(
-                { resource_type: "auto", folder: "papers" }, // 👈 optional: organize files in a "papers" folder
-                (error:any, result:any) => {
-                  if (error || !result) {
-                    reject(error || new Error("Upload failed"));
-                  } else {
-                    resolve(result as { secure_url: string });
-                  }
-                }
-              );
-      
-              bufferStream.pipe(stream);
-            });
-      
-            const fileUrl = uploadResult.secure_url;
+    if (mimeType.startsWith("image/")) resourceType = "image";
+    else if (mimeType === "application/pdf") resourceType = "raw";
+    else resourceType = "raw"; 
 
-  
+    console.log("Uploading file with resourceType:", resourceType, "MIME:", mimeType);
+
+    const bufferStream = new Readable();
+    bufferStream.push(req.file.buffer);
+    bufferStream.push(null);
+
+    const uploadResult = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: resourceType, folder: "papers" },
+        (error, result) => {
+          if (error || !result) reject(error || new Error("Upload failed"));
+          else resolve(result as { secure_url: string });
+        }
+      );
+      bufferStream.pipe(stream);
+    });
+
+    // ✅ Create paper record
     const paper = await client.paper.create({
       data: {
         type,
         year,
-        fileUrl,
+        fileUrl: uploadResult.secure_url,
         subjectId: dbSubject.id,
-        uploadedBy: req.user?.id|| null,
+        uploadedBy: req.user?.id || null,
         isVerified: false,
       },
     });
 
+    console.log("Paper created successfully:", paper.id);
     res.status(201).json({ message: "Paper submitted", paper });
-
   } catch (error) {
-    console.error(" Error adding paper:", error);
+    console.error("Error adding paper:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};

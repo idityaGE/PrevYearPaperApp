@@ -1,5 +1,5 @@
 import axios from "axios";
-import {  useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import React from "react";
@@ -33,7 +33,7 @@ const InputField = ({ label, name, type = "text", placeholder, value, onChange, 
         placeholder={placeholder || label}
         value={value}
         onChange={onChange}
-        className="border-white w-full p-3 text-base text-white placeholder-white bg-black border  rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200 resize-none"
+        className="w-full p-3 text-base text-white placeholder-white bg-black border border-white rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600"
       ></textarea>
     ) : (
       <input
@@ -43,14 +43,14 @@ const InputField = ({ label, name, type = "text", placeholder, value, onChange, 
         placeholder={placeholder || label}
         value={value}
         onChange={onChange}
-        className="w-full p-3 text-base text-white placeholder-white bg-black border border-white rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-white/40 transition-all duration-200"
+        className="w-full p-3 text-base text-white placeholder-white bg-black border border-white rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600"
       />
     )}
   </div>
 );
 
 function Contact() {
-  const { token} = useAuthStore();
+  const { token } = useAuthStore();
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -59,9 +59,7 @@ function Contact() {
     message: "",
   });
 
-
-
-  const [successMessage, setSuccessMessage] = useState(""); // <-- UI feedback
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -79,13 +77,15 @@ function Contact() {
       toast.error("Please fill out all fields.");
       return;
     }
-  
+
     if (!token || token.length < 20) {
       navigate("/signin");
       return;
     }
 
     try {
+      console.log(formData);
+      
       await axios.post(
         "http://localhost:3000/api/user/contact",
         { firstName, lastName, email, subject, message },
@@ -93,17 +93,10 @@ function Contact() {
       );
 
       toast.success("Message sent successfully!");
-      setSuccessMessage("✅ Your message has been sent! We will get back to you soon."); // <-- Set UI message
+      setSuccessMessage("Your message has been sent!");
 
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
+      setFormData({ firstName: "", lastName: "", email: "", subject: "", message: "" });
 
-      // Optionally clear the success message after 5 seconds
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (err) {
       console.error(err);
@@ -112,122 +105,55 @@ function Contact() {
   };
 
   return (
-    <div className="bg-[#09090b] text-foreground min-h-screen overflow-hidden">
-      <div className="flex justify-center items-center h-screen w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 text-white w-full">
-          {/* Left Info Panel */}
-          <div className="flex justify-center items-center p-8 sm:p-12">
-            <div className="w-full max-w-lg flex flex-col justify-center text-white space-y-10">
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-                  Contact Us
-                  <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-600">
-                    Let's Resolve Your Queries
-                  </span>
-                </h1>
-                <p className="text-lg md:text-xl text-gray-300 max-w-xl leading-relaxed">
-                  Our support team is ready to assist you. Share your feedback, technical issues, or collaboration inquiries below.
-                </p>
-              </div>
-              <div className="h-0.5 w-24 bg-indigo-500 rounded-full" />
-              <div className="space-y-4">
-                <h2 className="text-3xl font-bold mb-4">Reach Out Directly</h2>
-                <ul className="space-y-4 text-lg">
-                  <li className="flex items-center space-x-3">
-                    <span className="text-indigo-400 text-2xl">📞</span>
-                    <p className="text-gray-300">
-                      <span className="font-semibold text-white">Phone:</span> (+91) 8650152081
-                    </p>
-                  </li>
-                  <li className="flex items-center space-x-3">
-                    <span className="text-indigo-400 text-2xl">📧</span>
-                    <p className="text-gray-300">
-                      <span className="font-semibold text-white">Email:</span>{" "}
-                      <a href="mailto:email@example.com" className="ml-1 text-indigo-300 hover:text-indigo-400 transition-colors">
-                        pradeepkumar434680@gmail.com
-                      </a>
-                    </p>
-                  </li>
-                  {/* <li className="flex items-center space-x-3">
-                    <span className="text-indigo-400 text-2xl">🌐</span>
-                    <p className="text-gray-300">
-                      <span className="font-semibold text-white">Web:</span>{" "}
-                      <a href="https://shadcnblocks.com" target="_blank" rel="noopener noreferrer" className="ml-1 text-indigo-300 hover:text-indigo-400 transition-colors">
-                        shadcnblocks.com
-                      </a>
-                    </p>
-                  </li> */}
-                </ul>
-              </div>
-            </div>
-          </div>
+    <div className="bg-[#09090b] text-white min-h-screen">
+      <div className="container mx-auto px-4 py-10 lg:py-0 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-          {/* Right Form Panel */}
-          <div className="flex justify-center items-center p-4 sm:p-12">
-          <div className="w-full max-w-md p-8 sm:p-10  border rounded-xl shadow-lg">
-              {successMessage && (
-                <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
-                  {successMessage}
-                </div>
-              )}
+        {/* Left Section */}
+        <div className="text-center lg:text-left space-y-6 px-2">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
+            Contact Us
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-600">
+              We Are Here To Help
+            </span>
+          </h1>
 
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <InputField
-                    label="First Name"
-                    name="firstName"
-                    placeholder="First Name"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="flex-1">
-                  <InputField
-                    label="Last Name"
-                    name="lastName"
-                    placeholder="Last Name"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+          <p className="text-gray-300 text-base md:text-lg max-w-md mx-auto lg:mx-0">
+            Need support? We're just a message away.
+            Reach out for help, feedback, or business inquiries.
+          </p>
 
-              <InputField
-                label="Email"
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-
-              <InputField
-                label="Subject"
-                name="subject"
-                placeholder="Subject"
-                value={formData.subject}
-                onChange={handleChange}
-              />
-
-              <InputField
-                label="Message"
-                name="message"
-                isTextarea={true}
-                placeholder="Type your message here."
-                value={formData.message}
-                onChange={handleChange}
-              />
-
-              <button
-                onClick={handleSubmit}
-                className="w-full mt-4 py-3 bg-gray-200 text-black font-semibold text-lg rounded-lg shadow-sm hover:bg-gray-300 transition-all duration-200"
-              >
-                Send Message
-              </button>
-            </div>
+          <div className="space-y-3 text-lg md:text-xl">
+            <p><span className="font-semibold">(+91) 8650152081</span></p>
+            <p><a href="mailto:pradeepkumar434680@gmail.com" className="text-indigo-400 hover:underline">pradeepkumar434680@gmail.com</a></p>
           </div>
         </div>
+
+        {/* Right Form */}
+        <div className="bg-black border border-white/20 shadow-lg rounded-xl p-6 md:p-10 w-full max-w-lg mx-auto mt-10 sm:mt-40">
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
+              {successMessage}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} />
+            <InputField label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} />
+          </div>
+
+          <InputField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
+          <InputField label="Subject" name="subject" value={formData.subject} onChange={handleChange} />
+          <InputField label="Message" name="message" isTextarea value={formData.message} onChange={handleChange} />
+
+          <button
+            onClick={handleSubmit}
+            className="w-full mt-2 py-3 bg-gray-200 text-black font-semibold text-lg rounded-lg hover:bg-gray-300 transition"
+          >
+            Send Message
+          </button>
+        </div>
+
       </div>
     </div>
   );

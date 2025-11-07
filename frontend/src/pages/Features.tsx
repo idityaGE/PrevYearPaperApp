@@ -3,23 +3,23 @@ import { Button } from "../components/ui/button";
 function Features() {
   const features = [
     {
-      title: "📚 Upload Papers",
+      title: "Upload Papers",
       desc: "Easily upload previous year question papers and help other students access resources.",
     },
     {
-      title: "🔍 Smart Search",
+      title: "Smart Search",
       desc: "Search papers by department, subject, semester, or year using advanced filters.",
     },
     {
-      title: "👨‍🏫 Verified Content",
+      title: "Verified Content",
       desc: "All papers are verified to ensure authenticity and clarity.",
     },
     {
-      title: "⚡ Fast Performance",
+      title: "Fast Performance",
       desc: "Enjoy lightning‑fast load times and smooth browsing experience.",
     },
     {
-      title: "🔒 Secure Access",
+      title: "Secure Access",
       desc: "Modern security standards keep your data safe.",
     },
   ];
@@ -29,7 +29,7 @@ function Features() {
       {/* Title Section */}
       <div className="text-center max-w-3xl mb-14">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-400 drop-shadow-2xl">
-          ⚙️ Our Key Features
+           Our Key Features
         </h1>
         <p className="mt-4 text-gray-300 text-base sm:text-lg">
           A smarter, secure & modern platform built for students.
@@ -51,7 +51,7 @@ function Features() {
 
       {/* Footer Text */}
       <div className="mt-20 text-gray-400 text-center text-sm sm:text-base">
-        Built with ❤️ for smarter academic preparation.
+        Built with <i>Love</i> for smarter academic preparation.
       </div>
     </div>
   );

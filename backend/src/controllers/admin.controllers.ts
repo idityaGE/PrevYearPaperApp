@@ -57,3 +57,7 @@ export const verfyPaperById = async (req:express.Request, res:express.Response) 
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export const addDepartment = async (req:express.Request,res:express.Response)=>{
+  const { departmentName,programName} = req.body;
+}

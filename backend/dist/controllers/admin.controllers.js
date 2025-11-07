@@ -51,4 +51,7 @@ export const verfyPaperById = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+export const addDepartment = async (req, res) => {
+    const { departmentName, programName } = req.body;
+};
 //# sourceMappingURL=admin.controllers.js.map

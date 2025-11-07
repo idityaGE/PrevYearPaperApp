@@ -65,9 +65,6 @@ const ProfilePage = () => {
       return;
     }
 
-
-    console.log(profilePic);
-    
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -95,7 +92,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-gray-700 via-gray-900 to-black min-h-screen w-full flex justify-center items-center py-16 px-4">
+    <div className="bg-black min-h-screen w-full flex justify-center items-center py-16 px-4">
       <div className="w-full max-w-3xl bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-6 sm:p-10 text-white transition-all duration-300 hover:scale-[1.01]">
         
         {/* Profile Picture Section */}
