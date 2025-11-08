@@ -20,33 +20,35 @@ const allowedOrigins = [
 
 app.use(helmet());
 
-app.use((req, res, next) => {
-  console.log('Incoming Origin:', req.headers.origin);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('Incoming Origin:', req.headers.origin);
+//   next();
+// });
 
 
+app.use(cors({
+  origin:["https://prev-year-paper-app.vercel.app","https://prev-year-paper-app.vercel.app/"];
+}));
 
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (!origin) return callback(null, true); 
+//       const isAllowed = allowedOrigins.some(allowed => origin.startsWith(allowed));
+//       if (isAllowed) {
+//         callback(null, true);
+//       } else {
+//         console.log("Blocked by CORS:", origin);
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//   })
+// );
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); 
-      const isAllowed = allowedOrigins.some(allowed => origin.startsWith(allowed));
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        console.log("Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-
-app.options('*', cors());
+// app.options('*', cors());
 
 
 
