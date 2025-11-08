@@ -20,6 +20,7 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Spinner } from "./ui/spinner";
+import { BACKEND_URL } from "../lib/config";
 
 export function SignupComponent() {
 
@@ -45,7 +46,7 @@ export function SignupComponent() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/signup", {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/signup`, {
         name,
         email,
         password,

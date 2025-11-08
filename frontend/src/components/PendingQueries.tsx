@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { BACKEND_URL } from "../lib/config";
 
 function PendingQueries() {
   const [allQueries, setAllQueries] = useState<any[]>([]);
@@ -8,7 +9,7 @@ function PendingQueries() {
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/admin/queries",{
+        const response = await axios.get(`${BACKEND_URL}/api/admin/queries`,{
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
         setAllQueries(response.data);
@@ -59,7 +60,7 @@ function PendingQueries() {
 
               <button
                 onClick={async () => {
-                  await axios.put(`http://localhost:3000/api/admin/resolve-query/${q.id}`, {}, {
+                  await axios.put(`${BACKEND_URL}/api/admin/resolve-query/${q.id}`, {}, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                   });
                   const updated = allQueries.map((query) =>

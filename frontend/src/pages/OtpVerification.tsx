@@ -2,13 +2,14 @@ import axios from 'axios';
 import { InputOTPForm } from '../components/InputOTPForm';
 import { useAuthStore } from '../store/authStore';
 import { toast } from 'react-toastify';
+import { BACKEND_URL } from '../lib/config';
 
 function OtpVerification() {
   const email = useAuthStore((store) => store.email);
 
   const resendHandler = async () => {
     try {
-      await axios.post('http://localhost:3000/api/auth/resend-otp', { email });
+      await axios.post(`${BACKEND_URL}/api/auth/resend-otp`, { email });
       toast.success('A new OTP has been sent to your email!');
     } catch (error) {
       console.error('Error resending OTP:', error);

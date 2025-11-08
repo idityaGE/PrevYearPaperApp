@@ -11,6 +11,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Spinner } from "../components/ui/spinner";
 import { Button } from "../components/ui/button";
 import type { Paper } from "../types/paper";
+import { BACKEND_URL } from "../lib/config";
 
 // type Paper = {
 //   id: number;
@@ -71,7 +72,7 @@ export default function DashBoard() {
           return;
         }
 
-        const { data } = await axios.post("http://localhost:3000/api/user/papers", {
+        const { data } = await axios.post(`${BACKEND_URL}/api/user/papers`, {
           dept: selectedDept,
           program: selectedProgram,
           sem: selectedSemester,

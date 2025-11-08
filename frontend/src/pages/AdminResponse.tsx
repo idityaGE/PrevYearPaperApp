@@ -3,6 +3,7 @@ import { MessageSquare, Send } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../store/authStore";
+import { BACKEND_URL } from "../lib/config";
 
 // ✅ Define Query and User types
 interface User {
@@ -31,7 +32,7 @@ const AdminResponse: React.FC = () => {
     const fetchQueries = async () => {
       try {
         const res = await axios.get<Query[]>(
-          "http://localhost:3000/api/admin/queries",
+          `${BACKEND_URL}/api/admin/queries`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,7 +58,7 @@ const AdminResponse: React.FC = () => {
       if (!responseText.trim()) return;
 
       await axios.put(
-        `http://localhost:3000/api/admin/resolve-query/${queryId}`,
+        `${BACKEND_URL}/api/admin/resolve-query/${queryId}`,
         { response: responseText },
         {
           headers: {

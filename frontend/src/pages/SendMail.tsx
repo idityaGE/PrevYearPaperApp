@@ -2,6 +2,7 @@ import axios from "axios";
 import  { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "../lib/config";
 
 function SendMail() {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ function SendMail() {
 
     // Replace this with actual email sending API
 
-    const response =await axios.post('http://localhost:3000/api/auth/send-email',{email});
+    const response =await axios.post(`${BACKEND_URL}/api/auth/send-email`,{email});
 
     if(!response.data.message){
         //error

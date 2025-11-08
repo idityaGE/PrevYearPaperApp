@@ -12,6 +12,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import ToastContainerComponent from './ToastContainerComponent';
+import { BACKEND_URL } from '../lib/config';
 
 // function ModeToggle() {
 //   const { mode, setMode } = useColorScheme();
@@ -91,7 +92,7 @@ export default function Signin(/*props*/) {
           <InputBox name="password" type="password" onChange={(e:React.ChangeEvent<HTMLInputElement>)=>setPassword(e.target.value)} placeholder="password" />
           
         <CustomButton text="Sign up" onClick={async() => {
-          const response = await axios.post('http://localhost:3000/api/auth/signin',{
+          const response = await axios.post(`${BACKEND_URL}/api/auth/signin`,{
             email,
             password
           })

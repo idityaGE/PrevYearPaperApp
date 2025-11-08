@@ -12,6 +12,7 @@ import { useAuthStore } from "../store/authStore";
 import Button from "@mui/joy/Button";
 import { Loader2 } from "lucide-react";
 import FileInputBox from "../components/FileInputBox";
+import { BACKEND_URL } from "../lib/config";
 
 export default function AddPaper() {
   const { token } = useAuthStore();
@@ -87,7 +88,7 @@ export default function AddPaper() {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:3000/api/user/add-paper",
+        `${BACKEND_URL}/api/user/add-paper`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PaperCardSkeleton from "./PaperCardSkeleton";
+import { BACKEND_URL } from "../lib/config";
 
 interface PendingPaper {
   id: number;
@@ -29,7 +30,7 @@ function PendingPapers() {
 
   const fetchPapers = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/admin/pending-papers",{
+      const response = await axios.get(`${BACKEND_URL}/api/admin/pending-papers`,{
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       setPapers(response.data);
@@ -91,7 +92,7 @@ function PendingPapers() {
                   <button
                     onClick={() => {
                       axios
-                        .patch(`http://localhost:3000/api/admin/verify-paper/${p.id}`)
+                        .patch(`${BACKEND_URL}/api/admin/verify-paper/${p.id}`)
                         .then(() => {
                           toast.success("Paper verified successfully!");
                           setPapers(papers.filter((paper) => paper.id !== p.id));

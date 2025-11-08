@@ -19,6 +19,7 @@ import {
 import axios from "axios"
 import { useAuthStore } from "../store/authStore"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { BACKEND_URL } from "../lib/config"
 
 const FormSchema = z.object({
   pin: z.string().min(6, { message: "Your one-time password must be 6 characters." }),
@@ -41,7 +42,7 @@ export function InputOTPForm() {
     try {
       const otp: string = data.pin;
       
-        const res = await axios.post("http://localhost:3000/api/auth/verify-otp", {
+        const res = await axios.post(`${BACKEND_URL}/api/auth/verify-otp`, {
           email:userEmail,
           otp
         });

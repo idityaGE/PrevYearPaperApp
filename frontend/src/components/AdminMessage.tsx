@@ -1,5 +1,6 @@
 import axios from 'axios';
 import  { useEffect, useState } from 'react';
+import { BACKEND_URL } from '../lib/config';
 
 function AdminMessage({ userId }:{ userId: number }) {
   type Query = {
@@ -13,7 +14,7 @@ function AdminMessage({ userId }:{ userId: number }) {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/user/queries/${userId}`);
+      const res = await axios.get(`${BACKEND_URL}/api/user/queries/${userId}`);
       setQueries(res.data);
     } catch (err) {
       console.error(err);

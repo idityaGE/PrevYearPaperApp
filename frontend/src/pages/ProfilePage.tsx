@@ -2,6 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { BACKEND_URL } from "../lib/config";
 
 const InputForProfile = lazy(() => import("../components/InputForProfile"));
 
@@ -26,7 +27,7 @@ const ProfilePage = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:3000/api/user/profile", {
+      const response = await axios.get(`${BACKEND_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -77,7 +78,7 @@ const ProfilePage = () => {
         formData.append("profilePic", blob, "profile.jpg");
       }
 
-      await axios.put("http://localhost:3000/api/user/updateProfile", formData, {
+      await axios.put(`${BACKEND_URL}/api/user/updateProfile`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

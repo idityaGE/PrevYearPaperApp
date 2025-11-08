@@ -21,6 +21,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useAuthStore } from "../store/authStore";
 import { Spinner } from "./ui/spinner";
+import { BACKEND_URL } from "../lib/config";
 
 export function SigninComponent() {
   const {signin} = useAuthStore();
@@ -49,7 +50,7 @@ export function SigninComponent() {
         toast.error("Password should min 6 letters");
         return;
       }
-      const response = await axios.post("http://localhost:3000/api/auth/signin", {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/signin`, {
         email,
         password,
       });

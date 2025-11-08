@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import React from "react";
 import { useAuthStore } from "../store/authStore";
+import { BACKEND_URL } from "../lib/config";
 
 type FormData = {
   firstName: string;
@@ -87,7 +88,7 @@ function Contact() {
       console.log(formData);
       
       await axios.post(
-        "http://localhost:3000/api/user/contact",
+        `${BACKEND_URL}/api/user/contact`,
         { firstName, lastName, email, subject, message },
         { headers: { Authorization: `Bearer ${token}` } }
       );
