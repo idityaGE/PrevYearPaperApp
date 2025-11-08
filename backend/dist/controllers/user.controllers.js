@@ -1,11 +1,16 @@
-import client from "../lib/initClient.js";
-import express from "express";
-import cloudinary from "../utils/cloudinary.js";
-import zod from 'zod';
-export const userProfile = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.contactHandler = exports.uploadProfile = exports.userProfile = void 0;
+const initClient_js_1 = __importDefault(require("../lib/initClient.js"));
+const cloudinary_js_1 = __importDefault(require("../utils/cloudinary.js"));
+const zod_1 = __importDefault(require("zod"));
+const userProfile = async (req, res) => {
     const { id } = req.user;
     try {
-        const userProfile = await client.user.findUnique({
+        const userProfile = await initClient_js_1.default.user.findUnique({
             where: { id: Number(id) },
             select: {
                 id: true,
@@ -22,9 +27,10 @@ export const userProfile = async (req, res) => {
     catch (error) {
     }
 };
+exports.userProfile = userProfile;
 const streamUpload = (fileBuffer) => {
     return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream({ folder: "profile_pictures" }, (error, result) => {
+        const stream = cloudinary_js_1.default.uploader.upload_stream({ folder: "profile_pictures" }, (error, result) => {
             if (result)
                 resolve(result);
             else
@@ -66,7 +72,7 @@ const streamUpload = (fileBuffer) => {
 //     });
 //     res.json(updatedUser);
 //   }
-export const uploadProfile = async (req, res) => {
+const uploadProfile = async (req, res) => {
     const { name, bio, linkedIn, twitter } = req.body;
     const userId = req.user.id;
     if (!userId)
@@ -89,7 +95,7 @@ export const uploadProfile = async (req, res) => {
             updateData.twitter = twitter;
         if (profilePicUrl)
             updateData.profilePicUrl = profilePicUrl;
-        const updatedUser = await client.user.update({
+        const updatedUser = await initClient_js_1.default.user.update({
             where: { id: userId },
             data: updateData,
             select: { id: true, name: true, email: true, bio: true, profilePicUrl: true, linkedIn: true, twitter: true }
@@ -101,12 +107,13 @@ export const uploadProfile = async (req, res) => {
         res.status(500).json({ error: "Profile update failed" });
     }
 };
-const queryValidation = zod.object({
-    message: zod.string().nonempty("Message cannot be empty").max(1000, "Message too long"),
-    subject: zod.string().nonempty("subject cannot be empty").max(100, "Too long subject"),
-    userId: zod.number().optional()
+exports.uploadProfile = uploadProfile;
+const queryValidation = zod_1.default.object({
+    message: zod_1.default.string().nonempty("Message cannot be empty").max(1000, "Message too long"),
+    subject: zod_1.default.string().nonempty("subject cannot be empty").max(100, "Too long subject"),
+    userId: zod_1.default.number().optional()
 });
-export const contactHandler = async (req, res) => {
+const contactHandler = async (req, res) => {
     const { message, subject } = req.body;
     console.log(message, subject);
     const { id } = req.user;
@@ -115,7 +122,7 @@ export const contactHandler = async (req, res) => {
     if (!validation.success) {
         return res.status(400).json({ errors: validation.error.flatten().fieldErrors });
     }
-    await client.query.create({
+    await initClient_js_1.default.query.create({
         data: {
             message,
             subject,
@@ -128,4 +135,5 @@ export const contactHandler = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     });
 };
+exports.contactHandler = contactHandler;
 //# sourceMappingURL=user.controllers.js.map

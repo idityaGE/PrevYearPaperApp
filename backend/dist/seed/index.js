@@ -1,6 +1,6 @@
+"use strict";
 // import { PrismaClient } from "../../generated/prisma/index.js";
 // import { universityData } from "./universityData.js";
-export {};
 // const prisma = new PrismaClient();
 // async function main() {
 //   console.log("🧹 Clearing old data...");

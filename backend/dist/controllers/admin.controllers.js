@@ -1,9 +1,14 @@
-import express from 'express';
-import client from '../lib/initClient.js';
-export const getQueryById = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.addDepartment = exports.verfyPaperById = exports.getPendingPapers = exports.getQueryById = void 0;
+const initClient_js_1 = __importDefault(require("../lib/initClient.js"));
+const getQueryById = async (req, res) => {
     try {
         const { userId } = req.params;
-        const queries = await client.query.findMany({
+        const queries = await initClient_js_1.default.query.findMany({
             where: { userId: parseInt(userId) },
             orderBy: { createdAt: 'desc' },
         });
@@ -14,9 +19,10 @@ export const getQueryById = async (req, res) => {
         res.status(500).json({ error: 'Error fetching queries' });
     }
 };
-export const getPendingPapers = async (req, res) => {
+exports.getQueryById = getQueryById;
+const getPendingPapers = async (req, res) => {
     try {
-        const pendingPapers = await client.paper.findMany({
+        const pendingPapers = await initClient_js_1.default.paper.findMany({
             where: { isVerified: false },
             include: {
                 subject: {
@@ -37,10 +43,11 @@ export const getPendingPapers = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-export const verfyPaperById = async (req, res) => {
+exports.getPendingPapers = getPendingPapers;
+const verfyPaperById = async (req, res) => {
     try {
         const { id } = req.params;
-        const updated = await client.paper.update({
+        const updated = await initClient_js_1.default.paper.update({
             where: { id: Number(id) },
             data: { isVerified: true },
         });
@@ -51,7 +58,9 @@ export const verfyPaperById = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-export const addDepartment = async (req, res) => {
+exports.verfyPaperById = verfyPaperById;
+const addDepartment = async (req, res) => {
     const { departmentName, programName } = req.body;
 };
+exports.addDepartment = addDepartment;
 //# sourceMappingURL=admin.controllers.js.map

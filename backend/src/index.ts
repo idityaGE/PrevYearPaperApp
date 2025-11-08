@@ -47,7 +47,7 @@ app.use(
 );
 
 // Very important for preflight handling
-app.options('*', cors());
+
 
 
 

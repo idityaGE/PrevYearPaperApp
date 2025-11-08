@@ -1,5 +1,5 @@
+"use strict";
 // import { PrismaClient, PaperType } from "../../generated/prisma/index.js";
-export {};
 // const prisma = new PrismaClient();
 // async function main() {
 //   // Departments to target

@@ -1,15 +1,20 @@
-import { Router } from "express";
-import client from "../lib/initClient.js";
-import { addDepartment, getPendingPapers, verfyPaperById } from "../controllers/admin.controllers.js";
-import adminMiddleware from "../middleware/admin.js";
-const adminRouter = Router();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const initClient_js_1 = __importDefault(require("../lib/initClient.js"));
+const admin_controllers_js_1 = require("../controllers/admin.controllers.js");
+const admin_js_1 = __importDefault(require("../middleware/admin.js"));
+const adminRouter = (0, express_1.Router)();
 // adminRouter.post('/signup',(req,res)=>{
 //     const {name,email,password} = req.body;
 // })
-adminRouter.get("/pending-papers", adminMiddleware, getPendingPapers);
-adminRouter.patch("/verify-paper/:id", adminMiddleware, verfyPaperById);
-adminRouter.post("add-department", adminMiddleware, addDepartment);
-adminRouter.delete('/paper/:id', adminMiddleware, async (req, res) => {
+adminRouter.get("/pending-papers", admin_js_1.default, admin_controllers_js_1.getPendingPapers);
+adminRouter.patch("/verify-paper/:id", admin_js_1.default, admin_controllers_js_1.verfyPaperById);
+adminRouter.post("add-department", admin_js_1.default, admin_controllers_js_1.addDepartment);
+adminRouter.delete('/paper/:id', admin_js_1.default, async (req, res) => {
     // try {
     //   const {id} = req.params;
     //   //delete paper with the given id
@@ -26,11 +31,11 @@ adminRouter.delete('/paper/:id', adminMiddleware, async (req, res) => {
     //   res.status(500).json({ error: "Internal server error" });
     // }
 });
-adminRouter.put('/paper/:id', adminMiddleware, async (req, res) => {
+adminRouter.put('/paper/:id', admin_js_1.default, async (req, res) => {
     try {
         const { id } = req.params;
         const { type, year } = req.body;
-        const updated = await client.paper.update({
+        const updated = await initClient_js_1.default.paper.update({
             where: { id: Number(id) },
             data: { type, year }
         });
@@ -44,9 +49,9 @@ adminRouter.put('/paper/:id', adminMiddleware, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-adminRouter.get('/queries', adminMiddleware, async (req, res) => {
+adminRouter.get('/queries', admin_js_1.default, async (req, res) => {
     try {
-        const queries = await client.query.findMany({
+        const queries = await initClient_js_1.default.query.findMany({
             where: {
                 isResponded: false
             },
@@ -70,10 +75,10 @@ adminRouter.get('/queries', adminMiddleware, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-adminRouter.put('/resolve-query/:id', adminMiddleware, async (req, res) => {
+adminRouter.put('/resolve-query/:id', admin_js_1.default, async (req, res) => {
     try {
         const { id } = req.params;
-        await client.query.update({
+        await initClient_js_1.default.query.update({
             where: {
                 id: Number(id)
             },
@@ -91,5 +96,5 @@ adminRouter.put('/resolve-query/:id', adminMiddleware, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-export default adminRouter;
+exports.default = adminRouter;
 //# sourceMappingURL=adminRoute.js.map

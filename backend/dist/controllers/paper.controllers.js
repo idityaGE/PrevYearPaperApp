@@ -1,10 +1,14 @@
-import client from "../lib/initClient.js";
-import express from "express";
-import { PaperType } from "../../generated/prisma/index.js";
-import zod from 'zod';
-import cloudinary from "../utils/cloudinary.js";
-import { Readable } from "stream";
-export const getPapers = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.addPapers = exports.getPapers = void 0;
+const initClient_js_1 = __importDefault(require("../lib/initClient.js"));
+const zod_1 = __importDefault(require("zod"));
+const cloudinary_js_1 = __importDefault(require("../utils/cloudinary.js"));
+const stream_1 = require("stream");
+const getPapers = async (req, res) => {
     try {
         const { dept, program, sem, subject, examType, year } = req.body;
         const where = { isVerified: true };
@@ -29,7 +33,7 @@ export const getPapers = async (req, res) => {
             where.subject.semester.program = where.subject.semester.program || {};
             where.subject.semester.program.department = { name: dept };
         }
-        const papers = await client.paper.findMany({
+        const papers = await initClient_js_1.default.paper.findMany({
             where,
             include: {
                 subject: {
@@ -50,13 +54,14 @@ export const getPapers = async (req, res) => {
         res.status(500).json({ error: "Something went wrong!" });
     }
 };
-const paperValidation = zod.object({
-    department: zod.string("Department is required"),
-    program: zod.string("Program is required"),
-    semester: zod.number().min(1, "Semester must be a positive number"),
-    subject: zod.string("Subject is required"),
-    type: zod.string("Type is required"),
-    year: zod.number().min(1900).max(new Date().getFullYear(), "Invalid year"),
+exports.getPapers = getPapers;
+const paperValidation = zod_1.default.object({
+    department: zod_1.default.string("Department is required"),
+    program: zod_1.default.string("Program is required"),
+    semester: zod_1.default.number().min(1, "Semester must be a positive number"),
+    subject: zod_1.default.string("Subject is required"),
+    type: zod_1.default.string("Type is required"),
+    year: zod_1.default.number().min(1900).max(new Date().getFullYear(), "Invalid year"),
 });
 // export const addPapers = async (req:express.Request, res:express.Response) => {
 //   try {
@@ -130,7 +135,7 @@ const paperValidation = zod.object({
 //     res.status(500).json({ error: "Internal server error" });
 //   }
 // }
-export const addPapers = async (req, res) => {
+const addPapers = async (req, res) => {
     try {
         let { department, program, semester, subject, type, year } = req.body;
         semester = Number(semester);
@@ -142,25 +147,25 @@ export const addPapers = async (req, res) => {
             return res.status(400).json({ message: validation.error.issues });
         }
         // ✅ Verify department → program → semester → subject hierarchy
-        const dbDept = await client.department.findFirst({ where: { name: department } });
+        const dbDept = await initClient_js_1.default.department.findFirst({ where: { name: department } });
         if (!dbDept)
             return res.status(404).json({ error: "Department not found" });
-        const dbProgram = await client.program.findFirst({
+        const dbProgram = await initClient_js_1.default.program.findFirst({
             where: { name: program, departmentId: dbDept.id },
         });
         if (!dbProgram)
             return res.status(404).json({ error: "Program not found" });
-        const dbSemester = await client.semester.findFirst({
+        const dbSemester = await initClient_js_1.default.semester.findFirst({
             where: { number: semester, programId: dbProgram.id },
         });
         if (!dbSemester)
             return res.status(404).json({ error: "Semester not found" });
-        const dbSubject = await client.subject.findFirst({
+        const dbSubject = await initClient_js_1.default.subject.findFirst({
             where: { name: subject, semesterId: dbSemester.id },
         });
         if (!dbSubject)
             return res.status(404).json({ error: "Subject not found" });
-        const isExistPaper = await client.paper.findFirst({
+        const isExistPaper = await initClient_js_1.default.paper.findFirst({
             where: { type, year, subjectId: dbSubject.id },
         });
         if (isExistPaper) {
@@ -177,11 +182,11 @@ export const addPapers = async (req, res) => {
         else
             resourceType = "raw";
         console.log("Uploading file with resourceType:", resourceType, "MIME:", mimeType);
-        const bufferStream = new Readable();
+        const bufferStream = new stream_1.Readable();
         bufferStream.push(req.file.buffer);
         bufferStream.push(null);
         const uploadResult = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ resource_type: resourceType, folder: "papers" }, (error, result) => {
+            const stream = cloudinary_js_1.default.uploader.upload_stream({ resource_type: resourceType, folder: "papers" }, (error, result) => {
                 if (error || !result)
                     reject(error || new Error("Upload failed"));
                 else
@@ -190,7 +195,7 @@ export const addPapers = async (req, res) => {
             bufferStream.pipe(stream);
         });
         // ✅ Create paper record
-        const paper = await client.paper.create({
+        const paper = await initClient_js_1.default.paper.create({
             data: {
                 type,
                 year,
@@ -208,4 +213,5 @@ export const addPapers = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+exports.addPapers = addPapers;
 //# sourceMappingURL=paper.controllers.js.map

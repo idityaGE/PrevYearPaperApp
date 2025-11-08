@@ -1,14 +1,13 @@
-import { Router } from "express";
-import { signup, signin, verifyOTP, resendOTP, sendEmail } from "../controllers/auth.controllers.js";
-import client from "../lib/initClient.js";
-import zod from 'zod';
-import userMiddleware from "../middleware/user.js";
-import { authLimiter, otpResendLimiter } from "../utils/rateLimit.js";
-const authRouter = Router();
-authRouter.post("/signup", authLimiter, signup);
-authRouter.post("/signin", authLimiter, signin);
-authRouter.post('/verify-otp', otpResendLimiter, verifyOTP);
-authRouter.post('/resend-otp', otpResendLimiter, resendOTP);
-authRouter.post('/send-email', otpResendLimiter, sendEmail);
-export default authRouter;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_controllers_js_1 = require("../controllers/auth.controllers.js");
+const rateLimit_js_1 = require("../utils/rateLimit.js");
+const authRouter = (0, express_1.Router)();
+authRouter.post("/signup", rateLimit_js_1.authLimiter, auth_controllers_js_1.signup);
+authRouter.post("/signin", rateLimit_js_1.authLimiter, auth_controllers_js_1.signin);
+authRouter.post('/verify-otp', rateLimit_js_1.otpResendLimiter, auth_controllers_js_1.verifyOTP);
+authRouter.post('/resend-otp', rateLimit_js_1.otpResendLimiter, auth_controllers_js_1.resendOTP);
+authRouter.post('/send-email', rateLimit_js_1.otpResendLimiter, auth_controllers_js_1.sendEmail);
+exports.default = authRouter;
 //# sourceMappingURL=userRouter.js.map

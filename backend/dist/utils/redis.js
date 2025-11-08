@@ -1,9 +1,12 @@
+"use strict";
 // redisClient.ts
-import { createClient } from "redis";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getRedisClient = void 0;
+const redis_1 = require("redis");
 let redisClient = null;
-export const getRedisClient = async () => {
+const getRedisClient = async () => {
     if (!redisClient) {
-        redisClient = createClient({
+        redisClient = (0, redis_1.createClient)({
             url: process.env.REDIS_URL || "redis://localhost:6379"
         });
         redisClient.on("error", (err) => console.error("Redis Client Error", err));
@@ -11,4 +14,5 @@ export const getRedisClient = async () => {
     }
     return redisClient;
 };
+exports.getRedisClient = getRedisClient;
 //# sourceMappingURL=redis.js.map

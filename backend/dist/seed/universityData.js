@@ -1,3 +1,4 @@
+"use strict";
 // export const universityData = [
 //   {
 //     "department": "Computer Science and Engineering",
@@ -331,7 +332,6 @@
 //     }
 //   ]
 //   },
-export {};
 //   {
 //   "department": "Computer Science",
 //   "programs": [
