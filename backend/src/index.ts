@@ -50,8 +50,8 @@ app.get('/check', (req, res) => {
   res.send('Check route is working');
 });
 
-
+const BACKEND_URL = "https://myprevyearpaperapp.onrender.com"
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Example app listening at ${BACKEND_URL}`);
 });
 
