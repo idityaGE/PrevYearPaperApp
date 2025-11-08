@@ -44,23 +44,17 @@
 //   }, 
 //  "include": ["src/**/*", "types/**/*.d.ts"]
 // }
-
 {
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-
     "module": "CommonJS",
     "target": "ES2020",
     "lib": ["ESNext"],
-
-    /* keep typeRoots, remove types */
     "typeRoots": ["./node_modules/@types", "./types"],
-
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
