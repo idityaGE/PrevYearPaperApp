@@ -130,7 +130,7 @@ function Contact() {
         </div>
 
         {/* Right Form */}
-        <div className="bg-black border border-white/20 shadow-lg rounded-xl p-6 md:p-10 w-full max-w-lg mx-auto mt-10 sm:mt-40">
+        <div className="bg-black border border-white shadow-lg rounded-xl p-6 md:p-10 w-full max-w-lg mx-auto mt-10 sm:mt-40">
           {successMessage && (
             <div className="mb-4 p-3 bg-green-600 text-white rounded-lg text-center font-semibold">
               {successMessage}

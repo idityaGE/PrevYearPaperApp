@@ -60,10 +60,7 @@ export default function DashBoard() {
   /** Fetch Papers */
     const fetchPapers = useCallback(async () => {
 
-      // if (!selectedDept || !selectedProgram || !selectedSubject || !selectedSemester || !selectedExamType || !selectedYear) {
-      //   toast.warn("Please select all filters");
-      //   return;
-      // }
+
 
       try {
         setLoading(true);
