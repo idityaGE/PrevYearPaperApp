@@ -63,9 +63,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "types/**/*.d.ts"],
   "exclude": ["node_modules"]
