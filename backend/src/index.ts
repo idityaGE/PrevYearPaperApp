@@ -27,7 +27,7 @@ app.use(helmet());
 
 
 app.use(cors({
-  origin:["https://prev-year-paper-app.vercel.app","https://prev-year-paper-app.vercel.app/"];
+  origin:["https://prev-year-paper-app.vercel.app","https://prev-year-paper-app.vercel.app/"]
 }));
 
 // app.use(
