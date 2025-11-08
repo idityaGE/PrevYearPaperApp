@@ -44,6 +44,7 @@
 //   }, 
 //  "include": ["src/**/*", "types/**/*.d.ts"]
 // }
+
 {
   "compilerOptions": {
     "rootDir": "./src",
@@ -52,8 +53,9 @@
     "module": "CommonJS",
     "target": "ES2020",
     "lib": ["ESNext"],
+
+    /* keep typeRoots, remove types */
     "typeRoots": ["./node_modules/@types", "./types"],
-    "types": ["node", "express", "cors", "jsonwebtoken", "multer"],
 
     "sourceMap": true,
     "declaration": true,
@@ -63,7 +65,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["src/**/*", "types/**/*.d.ts"],
   "exclude": ["node_modules"]
