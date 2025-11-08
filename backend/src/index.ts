@@ -8,14 +8,24 @@ import paperRouter from './routes/paperRouter.js';
 import adminRouter from './routes/adminRoute.js';
 import uploadRouter from './routes/uploadRoute.js';
 import { generalLimiter } from './utils/rateLimit.js';
-
 dotenv.config();
-
 const app = express();
+
+
 const port = process.env.PORT || 3000;
-const allowedOrigins = ['https://prev-year-paper-app-xlxk.vercel.app', 'http://127.0.0.1:5173'];
+const allowedOrigins = [
+  'https://prev-year-paper-app.vercel.app'
+];
+
 
 app.use(helmet());
+
+app.use((req, res, next) => {
+  console.log('Incoming Origin:', req.headers.origin);
+  next();
+});
+
+
 
 app.use(cors({
   origin: function (origin, callback) {
