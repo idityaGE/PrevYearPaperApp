@@ -26,6 +26,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set('trust proxy', 1);
 
 
 
