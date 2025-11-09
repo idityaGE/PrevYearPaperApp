@@ -14,12 +14,15 @@ const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 
 
 async function sendOTP (email:string,otp :string){
+    console.log(" Sending OTP to:", email);
       await transporter.sendMail({
       from: 'pradeepkumar434680@gmail.com',
       to: email,
       subject: 'OTP Verification',
       text: `Your OTP is: ${otp}`
     });
+
+       console.log(" OTP sent successfully");
 }
 export const signup = async (req: express.Request, res: express.Response)=>{
 
