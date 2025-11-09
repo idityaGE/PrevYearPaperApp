@@ -1,5 +1,5 @@
 "use client";
-
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -72,8 +72,8 @@ export function SigninComponent() {
     setTimeout(() => navigate(redirectPath), 1000);
     } catch (error: any) {
       const message =
-       error.response?.data.errorMessage || // backend error message
-        error.message ||                 // network or other axios error
+       error.response?.data.errorMessage || 
+        error.message ||                
         "Something went wrong";
       toast.error(message);
     }
@@ -112,12 +112,9 @@ export function SigninComponent() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <a
-                  href="/send-otp"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                 verify your mail
-                </a>
+                  <Link to="/send-otp" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
+                      verify your mail
+                  </Link>
               </div>
 
 

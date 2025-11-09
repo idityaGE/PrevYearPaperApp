@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 export default function AboutUs() {
   return (
     <div className="bg-[#0a0a0b] min-h-screen w-full flex items-center justify-center p-4 sm:p-6 font-[Inter]">
@@ -23,12 +24,12 @@ export default function AboutUs() {
           </div>
 
           {/* Contact */}
-          <a
-            href="/contact"
-            className="text-lg text-white underline underline-offset-4 hover:text-indigo-400 transition"
-          >
-            Contact Us ↗
-          </a>
+<Link
+  to="/contact"
+  className="text-lg text-white underline underline-offset-4 hover:text-indigo-400 transition"
+>
+  Contact Us ↗
+</Link>
         </div>
 
         {/* RIGHT CONTENT */}
