@@ -6,23 +6,50 @@ import { generateToken } from '../lib/util.js';
 import nodemailer from 'nodemailer';
 import crypto  from 'crypto';
 import { success } from 'zod';
+import { Resend } from 'resend';
 
-
-
-
+const resend = new Resend(process.env.RESEND_API_KEY!);
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 
 
-async function sendOTP (email:string,otp :string){
-    console.log(" Sending OTP to:", email);
-      await transporter.sendMail({
-      from: 'pradeepkumar434680@gmail.com',
-      to: email,
+// async function sendOTP (email:string,otp :string){
+//     console.log(" Sending OTP to:", email);
+//       await transporter.sendMail({
+//       from: 'pradeepkumar434680@gmail.com',
+//       to: email,
+//       subject: 'OTP Verification',
+//       text: `Your OTP is: ${otp}`
+//     });
+
+//        console.log(" OTP sent successfully");
+// }
+
+  export async function sendOTP(email: string, otp: string) {
+  try {
+    console.log("Sending OTP to:", email);
+
+    const data = await resend.emails.send({
+      from: 'Your App pradeepkumar434680@gmail.com',  // ✅ replace with your verified domain email
+      to: [email],
       subject: 'OTP Verification',
-      text: `Your OTP is: ${otp}`
+      html: `
+        <div style="font-family:sans-serif;line-height:1.5;">
+          <h2> Email Verification</h2>
+          <p>Your One-Time Password (OTP) is:</p>
+          <h3 style="color:#2E86DE;">${otp}</h3>
+          <p>This OTP will expire in 10 minutes.</p>
+          <br/>
+          <p>– The Your App Team</p>
+        </div>
+      `,
     });
 
-       console.log(" OTP sent successfully");
+    console.log("OTP sent successfully:", data);
+    return data;
+  } catch (error: any) {
+    console.error("Error sending OTP:", error);
+    throw new Error("Failed to send OTP email");
+  }
 }
 export const signup = async (req: express.Request, res: express.Response)=>{
 
