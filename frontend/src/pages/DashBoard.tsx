@@ -68,7 +68,9 @@ export default function DashBoard() {
         const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${selectedSemester}-${selectedExamType}-${selectedYear}`;
 
         if (cache.current[key]) {
+
           setPapers(cache.current[key]);
+          toast.success("Cached Result")
           return;
         }
 
@@ -81,9 +83,14 @@ export default function DashBoard() {
           year: selectedYear,
         });
         console.log(data);
-        
+        if(data.length == 0){
+          toast.success("No Paper Found");
+          return;
+        }
         cache.current[key] = data;
+        
         setPapers(data);
+        toast.success(`${data.length} Papers Found`)
       } catch {
         toast.error("Failed to fetch papers");
       } finally {

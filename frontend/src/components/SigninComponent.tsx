@@ -40,6 +40,7 @@ export function SigninComponent() {
   };
 
   const handleSignin = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     try {
       if(!email || !password  ) {
@@ -55,7 +56,6 @@ export function SigninComponent() {
         password,
       });
       
-      setLoading(true);
       signin(response.data.token, email!);
 
     if(response.data.errorMessage){
@@ -151,22 +151,22 @@ export function SigninComponent() {
               </p>
             </div>
           </div>
-      <CardFooter className="flex flex-col gap-2 mt-4">
-        {loading ? (
-          <Button className="w-full border mt-4" disabled>
-            <Spinner className="animate-spin" />
-            Logging in ...
-          </Button>
-        ) : (
-          <Button 
-            type="submit" 
-            className="w-full border mt-4"
-            onClick={handleSignin} // if you're using form submit, keep it as submit
-          >
-            Sign In
-          </Button>
-        )}
-      </CardFooter>
+        <CardFooter className="flex flex-col gap-2 mt-4">
+          {loading ? (
+            <Button className="w-full border mt-4" disabled>
+              <Spinner className="animate-spin" />
+              Logging in ...
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              className="w-full border mt-4"
+              onClick={handleSignin} // if you're using form submit, keep it as submit
+            >
+              Sign In
+            </Button>
+          )}
+        </CardFooter>
 
         </form>
       </CardContent>
