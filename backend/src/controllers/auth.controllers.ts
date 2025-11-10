@@ -29,7 +29,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
     console.log("Sending OTP to:", email);
 
     const data = await resend.emails.send({
-      from: 'Your App pradeepkumar434680@gmail.com',  // ✅ replace with your verified domain email
+    from: "PrevYearPaper App <noreply@pdeep.store>",
+ // ✅ replace with your verified domain email
       to: [email],
       subject: 'OTP Verification',
       html: `
