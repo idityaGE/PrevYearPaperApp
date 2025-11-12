@@ -35,9 +35,9 @@ export default function DashBoard() {
   const [selectedDept, setSelectedDept] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null);
   const [selectedExamType, setSelectedExamType] = useState("");
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [papers, setPapers] = useState<Paper[]>([]);
 
@@ -55,17 +55,18 @@ export default function DashBoard() {
   }, [selectedProgram, programs]);
 
   const subjects = useMemo(() => {
-    return semesters.find(s => s.number === selectedSemester)?.subjects || [];
+    return semesters.find(s => s.number === Number(selectedSemester))?.subjects || [];
   }, [selectedSemester, semesters]);
-
+  
   /** Fetch Papers */
-    const fetchPapers = useCallback(async () => {
-
-
+  const fetchPapers = useCallback(async () => {
+    
+    var correctSemester = Number(selectedSemester);
+    var correctYear = Number(selectedYear);
 
       try {
         setLoading(true);
-        const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${selectedSemester}-${selectedExamType}-${selectedYear}`;
+        const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${correctSemester}-${selectedExamType}-${correctYear}`;
 
         if (cache.current[key]) {
 
@@ -77,10 +78,10 @@ export default function DashBoard() {
         const { data } = await axios.post(`${BACKEND_URL}/api/user/papers`, {
           dept: selectedDept,
           program: selectedProgram,
-          sem: selectedSemester,
+          sem: correctSemester,
           subject: selectedSubject,
           examType: selectedExamType,
-          year: selectedYear,
+          year: correctYear,
         });
         console.log(data);
         if(data.length == 0){
@@ -155,8 +156,8 @@ export default function DashBoard() {
         <SelectButton
           placeholder="Select Semester"
           options={semesters.map(s => s.number)}
-          onChange={(val) => setSelectedSemester(val ? Number(val) : null)}
-          value={selectedSemester !== null ? String(selectedSemester) : null}
+          onChange={(val) => setSelectedSemester(val ? val : null)}
+          value={selectedSemester !== null ? selectedSemester : null}
           disabled={!selectedProgram}
         />
         <Select
@@ -184,8 +185,8 @@ export default function DashBoard() {
           <SelectButton
             placeholder="Select Year"
             options={years}
-            onChange={(val) => setSelectedYear(val ? Number(val) : null)}
-            value={selectedYear !== null ? String(selectedYear) : null}
+            onChange={(val) => setSelectedYear(val ? val : null)}
+            value={selectedYear !== null ? selectedYear : null}
           />
         </Suspense>
       </div>
