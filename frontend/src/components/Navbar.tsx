@@ -22,7 +22,7 @@ export default function Navbar() {
         const res = await axios.get("http://localhost:3000/api/admin/getUserType", {
           params: { email },
         });
-        setIsAdmin(res.data.isAdmin); // assuming role stored as 'ADMIN'
+        setIsAdmin(res.data.role === "ADMIN"); // assuming role stored as 'ADMIN'
       } catch (err) {
         console.error("Error fetching user type:", err);
       }
