@@ -118,7 +118,7 @@ adminRouter.get("/getUserType", async (req, res) => {
         email: emailParam,
       },
     });
-
+    
     if (!dbUser) {
       return res.status(404).json({
         message: "User not found",
