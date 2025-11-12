@@ -6,14 +6,14 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAuthStore } from "../store/authStore";
 import ToastContainerComponent from "./ToastContainerComponent";
-import axios from "axios";
+// import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useAuthStore();
-  const {email} = useAuthStore();
+  // const {email} = useAuthStore();
   useEffect(()=>{
     
 
