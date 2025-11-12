@@ -29,9 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkAdmin: async (email: string) => {
     try {
-      const res = await axios.get("http://localhost:3000/api/admin/getUserType", {
-        params: { email },
-      });
+      const res = await axios.get(`http://localhost:3000/api/admin/getUserType?email=${email}`);
 
       set({ admin: res.data.isAdmin === true });
     } catch (error) {
