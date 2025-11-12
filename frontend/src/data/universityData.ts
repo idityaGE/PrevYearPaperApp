@@ -230,6 +230,109 @@ export const universityData = [
     ]
   },
   {
+  "department": "Biomedical Engineering",
+  "programs": [
+    {
+      "name": "B.Tech BME",
+      "semesters": [
+        {
+          "number": 1,
+          "subjects": [
+            "Engineering Mathematics-I",
+            "Introduction to Biomedical Engineering",
+            "Basic Electrical Engineering",
+            "English (Language and Communication Writing Skills-I)",
+            "Introduction to Programming",
+            "Programming Lab"
+          ]
+        },
+        {
+          "number": 2,
+          "subjects": [
+            "Engineering Mathematics-II",
+            "Basic Electronics Engineering",
+            "Universal Human Value (UHV)",
+            "Biomedical Engineering Workshop",
+            "Engineering Physics",
+            "Engineering Chemistry"
+          ]
+        },
+        {
+          "number": 3,
+          "subjects": [
+            "Signals and System Design",
+            "Biomedical Instrumentations",
+            "Pathology and Human Diseases",
+            "Biomaterials",
+            "Digital System Design",
+            "Biomedical Instrumentations and Devices Lab",
+            "Biomaterials Lab",
+            "Digital System Design Lab"
+          ]
+        },
+        {
+          "number": 4,
+          "subjects": [
+            "Biomechanics",
+            "Electronic Devices and Circuits",
+            "Molecular and Cellular Biology",
+            "Circuit Theory and Network Analysis",
+            "Human Anatomy and Physiology",
+            "Electronic Devices and Circuits Lab",
+            "Molecular and Cellular Biology Lab",
+            "Human Anatomy and Physiology Laboratory"
+          ]
+        },
+        {
+          "number": 5,
+          "subjects": [
+            "Environmental Studies",
+            "Biomedical Imaging",
+            "Invasive and Non-invasive Medical Diagnostic Technique",
+            "Analog Electronics",
+            "Program Electives I",
+            "Immunotechnology Lab",
+            "Analog Electronics Lab",
+            "Biomedical Imaging Laboratory"
+          ]
+        },
+        {
+          "number": 6,
+          "subjects": [
+            "Measurements and Instrumentations",
+            "Sensors & Transducers in Healthcare",
+            "Microcontrollers and Embedded System",
+            "Medical Image Processing",
+            "Program Electives II",
+            "Project I"
+          ]
+        },
+        {
+          "number": 7,
+          "subjects": [
+            "Digital Signal Processing",
+            "Biological Control Systems",
+            "Biomics Implants and Artificial Organs",
+            "Neuroscience and Neurotechnology",
+            "Project II",
+            "Short Internship",
+            "Program Electives III"
+          ]
+        },
+        {
+          "number": 8,
+          "subjects": [
+            "Program Electives IV",
+            "Program Electives V",
+            "Program Electives VI",
+            "Project III"
+          ]
+        }
+      ]
+    }
+  ]
+  },
+  {
   "department": "Computer Science",
   "programs": [
     {
@@ -1171,23 +1274,23 @@ export const universityData = [
         {
           "number": 5,
           "subjects": [
-            "Statistical Inference - II",
-            "Operations Research",
-            "Applied Statistics",
-            "Practicals using R",
-            "Open Elective (Science)",
-            "Open Elective (Social Science)"
-          ]
-        },
-        {
-          "number": 6,
-          "subjects": [
             "Statistical Quality Control",
             "Sample Surveys",
             "Design of Experiments",
             "Practicals using R",
             "Open Elective (Science/Social Science)",
             "Minor Project/Field trip/Internship"
+          ]
+        },
+        {
+          "number": 6,
+          "subjects": [
+            "Statistical Inference - II",
+            "Operations Research",
+            "Applied Statistics",
+            "Practicals using R",
+            "Open Elective (Science)",
+            "Open Elective (Social Science)"
           ]
         },
         {
