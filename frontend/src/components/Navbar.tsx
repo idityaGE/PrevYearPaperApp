@@ -1,23 +1,44 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAuthStore } from "../store/authStore";
 import ToastContainerComponent from "./ToastContainerComponent";
+import axios from "axios";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { token, logout } = useAuthStore();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { token, logout, email } = useAuthStore();
+
+  // ✅ Fetch user role when email changes
+  useEffect(() => {
+    const fetchUserType = async () => {
+      try {
+        if (!email) return;
+        const res = await axios.get("http://localhost:3000/api/admin/getUserType", {
+          params: { email },
+        });
+        setIsAdmin(res.data.isAdmin); // assuming role stored as 'ADMIN'
+      } catch (err) {
+        console.error("Error fetching user type:", err);
+      }
+    };
+    fetchUserType();
+  }, [email]);
 
   const handleAuthClick = () => {
     if (token) {
       logout();
+      setIsAdmin(false);
       toast.success("Logged out successfully!");
+      navigate("/signin");
+    } else {
+      navigate("/signin");
     }
-    navigate("/signin");
   };
 
   const navLinks = [
@@ -46,11 +67,22 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link) =>  (
+            
             <Link key={link.path} to={link.path} className={`${isActive(link.path)} transition`}>
               {link.name}
             </Link>
           ))}
+
+          {/* ✅ Admin Button (Visible only if isAdmin === true) */}
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="px-4 py-2 bg-yellow-400 text-black rounded-full font-semibold hover:bg-blue-400 transition shadow"
+            >
+              Go to Admin Panel
+            </button>
+          )}
 
           {/* Auth Button */}
           <button
@@ -96,6 +128,19 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+
+          {/* ✅ Admin Button in mobile view */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/admin");
+              }}
+              className="px-6 py-2 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-400 transition shadow"
+            >
+              Go to Admin Panel
+            </button>
+          )}
 
           {/* Auth Button */}
           <button

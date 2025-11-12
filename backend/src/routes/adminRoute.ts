@@ -100,4 +100,45 @@ adminRouter.put('/resolve-query/:id',adminMiddleware,async(req,res)=>{
   }
 })
 
+
+adminRouter.get("/getUserType", async (req, res) => {
+  const emailParam = Array.isArray(req.query.email)
+    ? req.query.email[0]
+    : req.query.email;
+
+  if (!emailParam) {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
+
+  try {
+    const dbUser = await client.user.findFirst({
+      where: {
+        email: emailParam,
+      },
+    });
+
+    if (!dbUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const isAdmin = dbUser.role === "ADMIN";
+
+    return res.status(200).json({
+      message: isAdmin ? "User is an admin" : "User is not an admin",
+      isAdmin,
+      role: dbUser.role,
+    });
+  } catch (error) {
+    console.error("Error checking user type:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
 export default adminRouter;
+
