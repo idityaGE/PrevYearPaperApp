@@ -2,7 +2,7 @@ export default function SigninSidebar() {
   return (
     <div className="w-full h-full flex flex-col justify-center px-14 xl:px-28 text-white animate-sidebarFade">
       
-      <h1 className="text-5xl xl:text-6xl font-extrabold mb-6 leading-tight">
+      <h1 className="text-4xl xl:text-6xl font-extrabold mb-6 leading-tight">
         Welcome to 
         <br />
         <span className="text-indigo-400">Prev-Year Question Paper App</span>
