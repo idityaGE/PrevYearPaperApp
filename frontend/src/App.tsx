@@ -44,7 +44,7 @@ function App() {
           <Route path="/features" element={<Features />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/send-otp" element={<SendMail />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin" element={<ProtectedRoute ><Admin/></ProtectedRoute>} />
 
           <Route
            path="/add-paper" 
