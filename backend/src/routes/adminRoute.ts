@@ -11,9 +11,9 @@ const adminRouter = Router();
 
 adminRouter.get("/pending-papers",adminMiddleware,getPendingPapers);
 
-adminRouter.patch("/verify-paper/:id",adminMiddleware,verfyPaperById);
+adminRouter.put('/verify-paper/:id',adminMiddleware,verfyPaperById);
 
-adminRouter.post("add-department",adminMiddleware,addDepartment);
+adminRouter.post("/add-department",adminMiddleware,addDepartment);
 
 adminRouter.delete('/paper/:id',adminMiddleware,async(req,res)=>{
   // try {

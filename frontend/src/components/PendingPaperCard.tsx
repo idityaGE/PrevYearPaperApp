@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PaperCardSkeleton from "./PaperCardSkeleton";
 import { BACKEND_URL } from "../lib/config";
+import { useAuthStore } from "../store/authStore";
 
 interface PendingPaper {
   id: number;
@@ -27,6 +28,7 @@ interface PendingPaper {
 function PendingPapers() {
   const [papers, setPapers] = useState<PendingPaper[]>([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuthStore();
 
   const fetchPapers = async () => {
     try {
@@ -92,12 +94,20 @@ function PendingPapers() {
                   <button
                     onClick={() => {
                       axios
-                        .patch(`${BACKEND_URL}/api/admin/verify-paper/${p.id}`)
+                        .put(`${BACKEND_URL}/api/admin/verify-paper/${p.id}`,{},{
+                          headers:{
+                            Authorization:`Bearer ${token}`
+                          }
+                        })
                         .then(() => {
                           toast.success("Paper verified successfully!");
                           setPapers(papers.filter((paper) => paper.id !== p.id));
                         })
-                        .catch(() => toast.error("Failed to verify paper."));
+                        .catch((error) => {
+                          console.log(error);
+                          
+                          toast.error("Failed to verify paper.")
+                        });
                     }}
                     className="bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg 
                                hover:bg-yellow-400 transition-all duration-200"

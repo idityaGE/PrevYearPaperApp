@@ -43,8 +43,12 @@ export const getPendingPapers = async (req:express.Request, res:express.Response
 
 
 export const verfyPaperById = async (req:express.Request, res:express.Response) => {
+  console.log("Entered");
+  
   try {
     const { id } = req.params;
+    console.log("paper id",id);
+    console.log("Type of id =>",typeof id);
     
     const updated = await client.paper.update({
       where: { id: Number(id) },
@@ -59,5 +63,8 @@ export const verfyPaperById = async (req:express.Request, res:express.Response) 
 }
 
 export const addDepartment = async (req:express.Request,res:express.Response)=>{
-  const { departmentName,programName} = req.body;
+  // const { departmentName,programName} = req.body;
+  return res.json({
+    message:"done"
+  })
 }
