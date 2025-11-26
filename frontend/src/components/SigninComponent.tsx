@@ -47,7 +47,7 @@ export function SigninComponent() {
         password,
       });
 
-      signin(response.data.token, email!);
+      await signin(response.data.token, email!);
 
       if (response.data.errorMessage) {
         toast.error(response.data.errorMessage);

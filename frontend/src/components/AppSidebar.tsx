@@ -20,6 +20,10 @@ import {
   LogOut,
   User,
   LogIn,
+  FileText,
+  MessageSquare,
+  Files,
+  Users as UsersIcon,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
@@ -27,7 +31,7 @@ import { useAuthStore } from "@/store/authStore";
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { token, logout } = useAuthStore();
+  const { token, logout, admin } = useAuthStore();
   const { setOpenMobile } = useSidebar();
 
   const handleLogout = () => {
@@ -63,6 +67,29 @@ export function AppSidebar() {
       title: "Contact",
       url: "/contact",
       icon: Mail,
+    },
+  ];
+
+  const adminItems = [
+    {
+      title: "Pending Papers",
+      url: "/admin/pending-papers",
+      icon: FileText,
+    },
+    {
+      title: "Queries",
+      url: "/admin/queries",
+      icon: MessageSquare,
+    },
+    {
+      title: "All Papers",
+      url: "/admin/all-papers",
+      icon: Files,
+    },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: UsersIcon,
     },
   ];
 
@@ -126,6 +153,30 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {admin && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname === item.url}
+                      tooltip={item.title}
+                    >
+                      <Link to={item.url} onClick={handleNavigation}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter className="py-4">
         {token ? (

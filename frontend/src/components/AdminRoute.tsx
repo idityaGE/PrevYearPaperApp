@@ -1,12 +1,12 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 
-type ProtectedRouteProps = {
+type AdminRouteProps = {
   children: React.ReactNode;
 };
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { token } = useAuthStore();
+export default function AdminRoute({ children }: AdminRouteProps) {
+  const { token, admin } = useAuthStore();
   const location = useLocation();
 
   if (!token) {
@@ -19,6 +19,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         replace
       />
     );
+  }
+
+  if (!admin) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

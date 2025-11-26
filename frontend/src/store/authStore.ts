@@ -1,13 +1,14 @@
 import axios from "axios";
 import { create } from "zustand";
+import { BACKEND_URL } from "@/lib/config";
 
 interface AuthState {
   email: string | null;
   token: string | null;
   admin: boolean;
   logout: () => void;
-  signin: (token: string, email: string) => void;
-  checkAdmin: (email: string) => Promise<void>;
+  signin: (token: string, email: string) => Promise<void>;
+  checkAdmin: () => Promise<void>;
 }
 
 // Initialize from localStorage
@@ -36,18 +37,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token: null, email: null, admin: false });
   },
 
-  signin: (token, email) => {
+  signin: async (token, email) => {
     localStorage.setItem("token", token);
     localStorage.setItem("email", email);
     set({ token, email });
-  },
 
-  checkAdmin: async (email: string) => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/admin/getUserType?email=${email}`
+        `${BACKEND_URL}/api/admin/getUserType?email=${email}`
       );
+      set({ admin: res.data.isAdmin === true });
+    } catch (error) {
+      console.error("Error checking admin role:", error);
+      set({ admin: false });
+    }
+  },
 
+  checkAdmin: async () => {
+    const { email } = useAuthStore.getState();
+    if (!email) return;
+
+    try {
+      const res = await axios.get(
+        `${BACKEND_URL}/api/admin/getUserType?email=${email}`
+      );
       set({ admin: res.data.isAdmin === true });
     } catch (error) {
       console.error("Error checking admin role:", error);

@@ -12,9 +12,15 @@ import {
 
 type PaperCardProps = {
   paper: Paper;
+  customActions?: React.ReactNode;
+  showDefaultAction?: boolean;
 };
 
-function PaperCard({ paper }: PaperCardProps) {
+function PaperCard({
+  paper,
+  customActions,
+  showDefaultAction = true,
+}: PaperCardProps) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async (e: React.MouseEvent) => {
@@ -78,14 +84,13 @@ function PaperCard({ paper }: PaperCardProps) {
         {/* Divider */}
         <div className="h-px bg-border" />
 
-        {/* Details Grid - e2b.dev inspired */}
         <div className="space-y-2 text-sm flex-1">
           <div className="flex items-center justify-between py-2 px-3 rounded-md bg-muted/30 border border-border/50">
             <span className="text-muted-foreground flex items-center gap-2">
               <Building2 className="h-3.5 w-3.5 shrink-0" />
               Department
             </span>
-            <span className="font-medium text-foreground text-right ml-2 break-words">
+            <span className="font-medium text-foreground text-right ml-2">
               {paper.subject.semester.program.department.name}
             </span>
           </div>
@@ -124,31 +129,36 @@ function PaperCard({ paper }: PaperCardProps) {
         <div className="h-px bg-border" />
 
         {/* Action Button - At Bottom */}
-        <Button
-          asChild={!isDownloading}
-          variant="outline"
-          disabled={isDownloading}
-          className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all mt-auto"
-        >
-          {isDownloading ? (
-            <div className="flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Downloading...
-            </div>
-          ) : (
-            <a
-              href={paper.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleDownload}
-              className="flex items-center justify-center gap-2"
+        <div className="mt-auto space-y-2">
+          {showDefaultAction && (
+            <Button
+              asChild={!isDownloading}
+              variant="outline"
+              disabled={isDownloading}
+              className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all"
             >
-              <BookOpen className="h-4 w-4" />
-              View Paper
-              <ExternalLink className="h-3.5 w-3.5 opacity-50" />
-            </a>
+              {isDownloading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Downloading...
+                </div>
+              ) : (
+                <a
+                  href={paper.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleDownload}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  View Paper
+                  <ExternalLink className="h-3.5 w-3.5 opacity-50" />
+                </a>
+              )}
+            </Button>
           )}
-        </Button>
+          {customActions}
+        </div>
       </div>
     </div>
   );
