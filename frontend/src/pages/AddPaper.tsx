@@ -192,7 +192,7 @@ export default function AddPaper() {
 
         <Separator />
 
-        <div className="bg-background py-6 px-4">
+        <div className="bg-background dark:bg-card py-6 px-4">
           {/* Form Section */}
           <div className="grid gap-8 md:grid-cols-2">
             <div className="space-y-2">
