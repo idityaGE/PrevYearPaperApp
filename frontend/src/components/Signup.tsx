@@ -4,14 +4,12 @@ import CssBaseline from '@mui/joy/CssBaseline';
 import Typography from '@mui/joy/Typography';
 import axios from 'axios';
 import Link from '@mui/joy/Link';
-import {  toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'sonner';
 
 import InputBox from './InputBox';
 import CustomButton from './CustomButton';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ToastContainerComponent from './ToastContainerComponent';
 import { BACKEND_URL } from '../lib/config';
 
 // function ModeToggle() {
@@ -118,7 +116,6 @@ export default function Signup(/*props*/) {
           Don&apos;t have an account?
           </Typography>
         </Sheet>
-        <ToastContainerComponent/>
       </CssVarsProvider>
     </main>
   );
