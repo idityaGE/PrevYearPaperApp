@@ -1,77 +1,80 @@
 import axios from "axios";
-import  { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { BACKEND_URL } from "../lib/config";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 function SendMail() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = async() => {
+  const handleSend = async () => {
     if (!email) {
       toast.error("Please enter an email");
       return;
     }
 
-    // Replace this with actual email sending API
+    setLoading(true);
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/send-email`, {
+        email,
+      });
 
-    const response =await axios.post(`${BACKEND_URL}/api/auth/send-email`,{email});
-
-    if(!response.data.message){
-        //error
+      if (!response.data.message) {
         toast.error("Error in sending the otp please try again");
         return;
-    }
+      }
 
-    setSuccess(`Email sent successfully to ${email}`);
-    toast.success(`Email sent successfully to ${email}`)
-    setEmail(""); 
-    navigate('/email-verification');
-};
-    
+      toast.success(`Email sent successfully to ${email}`);
+      setEmail("");
+      navigate("/email-verification");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send email. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-      <div className="w-full max-w-md p-8 bg-gray-900 rounded-xl shadow-lg text-white">
-        {/* Header */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2">
-          Send Mail
-        </h1>
-        <p className="text-gray-400 text-center mb-6">
-          Enter the recipient's email below and click send.
-        </p>
-
-        {/* Input */}
-        <input
-          type="email"
-          placeholder="Recipient email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        {/* Send button */}
-        <button
-          onClick={handleSend}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors"
-        >
-          Send
-        </button>
-
-        {/* Success message */}
-        {success && (
-          <p className="mt-4 text-green-400 text-center font-medium">
-            {success}
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Send Mail</CardTitle>
+          <CardDescription>
+            Enter the recipient's email below and click send.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Recipient Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <Button className="w-full" onClick={handleSend} disabled={loading}>
+            {loading ? "Sending..." : "Send"}
+          </Button>
+          <p className="text-muted-foreground text-sm text-center">
+            This page allows you to send an email to a user.
           </p>
-        )}
-
-        {/* Footer */}
-        <p className="mt-6 text-gray-500 text-sm text-center">
-          This page allows you to send an email to a user.
-        </p>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

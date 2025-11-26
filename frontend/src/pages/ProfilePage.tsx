@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAuthStore } from "../store/authStore";
 import { BACKEND_URL } from "../lib/config";
 
@@ -20,7 +21,6 @@ const ProfilePage = () => {
 
   const { token } = useAuthStore();
   const fetchUserInfo = async () => {
-
     if (!token || token.length < 20) {
       navigate("/signin");
       return;
@@ -85,17 +85,18 @@ const ProfilePage = () => {
         },
       });
 
+      toast.success("Profile updated successfully!");
       setIsEditing(false);
       fetchUserInfo();
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast.error("Failed to update profile. Please try again.");
     }
   };
 
   return (
     <div className="bg-black min-h-screen w-full flex justify-center items-center py-16 px-4">
       <div className="w-full max-w-3xl bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-6 sm:p-10 text-white transition-all duration-300 hover:scale-[1.01]">
-        
         {/* Profile Picture Section */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
@@ -143,7 +144,9 @@ const ProfilePage = () => {
                 />
               </Suspense>
             ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">{name}</p>
+              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">
+                {name}
+              </p>
             )}
           </div>
 
@@ -159,10 +162,9 @@ const ProfilePage = () => {
                 className="w-full mt-1 p-3 rounded-lg bg-white/5 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             ) : (
-            <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-              {bio && bio.trim() !== "" ? bio : "No bio available"}
-            </p>
-
+              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
+                {bio && bio.trim() !== "" ? bio : "No bio available"}
+              </p>
             )}
           </div>
 
@@ -179,8 +181,10 @@ const ProfilePage = () => {
               </Suspense>
             ) : (
               <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-              {twitterHandle && twitterHandle.trim() !== "" ? twitterHandle : "No bio available"}
-            </p>
+                {twitterHandle && twitterHandle.trim() !== ""
+                  ? twitterHandle
+                  : "No bio available"}
+              </p>
             )}
 
             <label className="text-sm text-gray-300 mt-4 block">LinkedIn</label>
@@ -193,9 +197,11 @@ const ProfilePage = () => {
                 />
               </Suspense>
             ) : (
-          <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-            {linkedinProfile && linkedinProfile.trim() !== "" ? linkedinProfile : "No bio available"}
-          </p>
+              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
+                {linkedinProfile && linkedinProfile.trim() !== ""
+                  ? linkedinProfile
+                  : "No bio available"}
+              </p>
             )}
           </div>
         </div>

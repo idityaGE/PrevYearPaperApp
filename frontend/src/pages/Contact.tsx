@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import React from "react";
 import { useAuthStore } from "../store/authStore";
 import { BACKEND_URL } from "../lib/config";
@@ -20,11 +20,21 @@ type InputFieldProps = {
   type?: string;
   placeholder?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   isTextarea?: boolean;
 };
 
-const InputField = ({ label, name, type = "text", placeholder, value, onChange, isTextarea = false }: InputFieldProps) => (
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  value,
+  onChange,
+  isTextarea = false,
+}: InputFieldProps) => (
   <div className="mb-4">
     {isTextarea ? (
       <textarea
@@ -63,7 +73,9 @@ function Contact() {
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -86,7 +98,7 @@ function Contact() {
 
     try {
       console.log(formData);
-      
+
       await axios.post(
         `${BACKEND_URL}/api/user/contact`,
         { firstName, lastName, email, subject, message },
@@ -96,7 +108,13 @@ function Contact() {
       toast.success("Message sent successfully!");
       setSuccessMessage("Your message has been sent!");
 
-      setFormData({ firstName: "", lastName: "", email: "", subject: "", message: "" });
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
 
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (err) {
@@ -108,7 +126,6 @@ function Contact() {
   return (
     <div className="bg-[#09090b] text-white min-h-screen">
       <div className="container mx-auto px-4 py-10 lg:py-0 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-
         {/* Left Section */}
         <div className="text-center lg:text-left space-y-6 px-2">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
@@ -120,13 +137,22 @@ function Contact() {
           </h1>
 
           <p className="text-gray-300 text-base md:text-lg max-w-md mx-auto lg:mx-0">
-            Need support? We're just a message away.
-            Reach out for help, feedback, or business inquiries.
+            Need support? We're just a message away. Reach out for help,
+            feedback, or business inquiries.
           </p>
 
           <div className="space-y-3 text-lg md:text-xl">
-            <p><span className="font-semibold">(+91) 8650152081</span></p>
-            <p><a href="mailto:pradeepkumar434680@gmail.com" className="text-indigo-400 hover:underline">pradeepkumar434680@gmail.com</a></p>
+            <p>
+              <span className="font-semibold">(+91) 8650152081</span>
+            </p>
+            <p>
+              <a
+                href="mailto:pradeepkumar434680@gmail.com"
+                className="text-indigo-400 hover:underline"
+              >
+                pradeepkumar434680@gmail.com
+              </a>
+            </p>
           </div>
         </div>
 
@@ -139,13 +165,40 @@ function Contact() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <InputField label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} />
-            <InputField label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} />
+            <InputField
+              label="First Name"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+            />
+            <InputField
+              label="Last Name"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+            />
           </div>
 
-          <InputField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
-          <InputField label="Subject" name="subject" value={formData.subject} onChange={handleChange} />
-          <InputField label="Message" name="message" isTextarea value={formData.message} onChange={handleChange} />
+          <InputField
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Subject"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+          />
+          <InputField
+            label="Message"
+            name="message"
+            isTextarea
+            value={formData.message}
+            onChange={handleChange}
+          />
 
           <button
             onClick={handleSubmit}
@@ -154,7 +207,6 @@ function Contact() {
             Send Message
           </button>
         </div>
-
       </div>
     </div>
   );

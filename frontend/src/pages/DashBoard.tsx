@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
-import { universityData, examTypes,  years } from "../data/universityData";
+import { universityData, examTypes, years } from "../data/universityData";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
@@ -7,29 +7,11 @@ const CustomButton = lazy(() => import("../components/CustomButton"));
 const SelectButton = lazy(() => import("../components/SelectButton"));
 const PaperCard = lazy(() => import("../components/PaperCard"));
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "sonner";
 import { Spinner } from "../components/ui/spinner";
 import { Button } from "../components/ui/button";
 import type { Paper } from "../types/paper";
 import { BACKEND_URL } from "../lib/config";
-
-// type Paper = {
-//   id: number;
-//   type: string;
-//   year: number;
-//   fileUrl: string;
-//   isVerified: boolean;
-//   subject: {
-//     name: string;
-//     code: string;
-//     semester: {
-//       number: number;
-//       program: {
-//         department: { name: string };
-//       };
-//     };
-//   };
-// };
 
 export default function DashBoard() {
   const [selectedDept, setSelectedDept] = useState("");
@@ -44,78 +26,89 @@ export default function DashBoard() {
   const cache = useRef<Record<string, Paper[]>>({});
 
   // Memo Filters
-  const departments = useMemo(() => universityData.map(d => d.department), []);
+  const departments = useMemo(
+    () => universityData.map((d) => d.department),
+    []
+  );
 
   const programs = useMemo(() => {
-    return universityData.find(d => d.department === selectedDept)?.programs || [];
+    return (
+      universityData.find((d) => d.department === selectedDept)?.programs || []
+    );
   }, [selectedDept]);
 
   const semesters = useMemo(() => {
-    return programs.find(p => p.name === selectedProgram)?.semesters || [];
+    return programs.find((p) => p.name === selectedProgram)?.semesters || [];
   }, [selectedProgram, programs]);
 
   const subjects = useMemo(() => {
-    return semesters.find(s => s.number === Number(selectedSemester))?.subjects || [];
+    return (
+      semesters.find((s) => s.number === Number(selectedSemester))?.subjects ||
+      []
+    );
   }, [selectedSemester, semesters]);
-  
+
   /** Fetch Papers */
   const fetchPapers = useCallback(async () => {
-    
-    var correctSemester = Number(selectedSemester);
-    var correctYear = Number(selectedYear);
+    const correctSemester = Number(selectedSemester);
+    const correctYear = Number(selectedYear);
 
-      try {
-        setLoading(true);
-        const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${correctSemester}-${selectedExamType}-${correctYear}`;
+    try {
+      setLoading(true);
+      const key = `${selectedDept}-${selectedProgram}-${selectedSubject}-${correctSemester}-${selectedExamType}-${correctYear}`;
 
-        if (cache.current[key]) {
-
-          setPapers(cache.current[key]);
-          toast.success("Cached Result")
-          return;
-        }
-
-        const { data } = await axios.post(`${BACKEND_URL}/api/user/papers`, {
-          dept: selectedDept,
-          program: selectedProgram,
-          sem: correctSemester,
-          subject: selectedSubject,
-          examType: selectedExamType,
-          year: correctYear,
-        });
-        console.log(data);
-        if(data.length == 0){
-          toast.success("No Paper Found");
-          return;
-        }
-        cache.current[key] = data;
-        
-        setPapers(data);
-        toast.success(`${data.length} Papers Found`)
-      } catch {
-        toast.error("Failed to fetch papers");
-      } finally {
-        setLoading(false);
+      if (cache.current[key]) {
+        setPapers(cache.current[key]);
+        toast.success("Cached Result");
+        return;
       }
-    }, [selectedDept, selectedProgram, selectedSubject, selectedSemester, selectedExamType, selectedYear]);
 
-    /** Reset All Filters */
-    const resetFilters = () => {
-      setSelectedDept("");
-      setSelectedProgram("");
-      setSelectedSubject("");
-      setSelectedSemester(null);
-      setSelectedExamType("");
-      setSelectedYear(null);
-      setPapers([]);
-    };
+      const { data } = await axios.post(`${BACKEND_URL}/api/user/papers`, {
+        dept: selectedDept,
+        program: selectedProgram,
+        sem: correctSemester,
+        subject: selectedSubject,
+        examType: selectedExamType,
+        year: correctYear,
+      });
+      console.log(data);
+      if (data.length == 0) {
+        toast.success("No Paper Found");
+        return;
+      }
+      cache.current[key] = data;
+
+      setPapers(data);
+      toast.success(`${data.length} Papers Found`);
+    } catch {
+      toast.error("Failed to fetch papers");
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    selectedDept,
+    selectedProgram,
+    selectedSubject,
+    selectedSemester,
+    selectedExamType,
+    selectedYear,
+  ]);
+
+  /** Reset All Filters */
+  const resetFilters = () => {
+    setSelectedDept("");
+    setSelectedProgram("");
+    setSelectedSubject("");
+    setSelectedSemester(null);
+    setSelectedExamType("");
+    setSelectedYear(null);
+    setPapers([]);
+  };
 
   return (
     <div className="bg-[#0b0c0d] min-h-screen w-full p-5 text-white">
-
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center mb-8">
-
         {/* Department */}
         <Select
           placeholder="Select Department"
@@ -130,7 +123,9 @@ export default function DashBoard() {
           sx={{ width: 250 }}
         >
           {departments.map((dept) => (
-            <Option key={dept} value={dept}>{dept}</Option>
+            <Option key={dept} value={dept}>
+              {dept}
+            </Option>
           ))}
         </Select>
 
@@ -148,14 +143,16 @@ export default function DashBoard() {
           sx={{ width: 250 }}
         >
           {programs.map((prog) => (
-            <Option key={prog.name} value={prog.name}>{prog.name}</Option>
+            <Option key={prog.name} value={prog.name}>
+              {prog.name}
+            </Option>
           ))}
         </Select>
 
         {/* Subject */}
         <SelectButton
           placeholder="Select Semester"
-          options={semesters.map(s => s.number)}
+          options={semesters.map((s) => s.number)}
           onChange={(val) => setSelectedSemester(val ? val : null)}
           value={selectedSemester !== null ? selectedSemester : null}
           disabled={!selectedProgram}
@@ -169,12 +166,13 @@ export default function DashBoard() {
           sx={{ width: 250 }}
         >
           {subjects.map((subj) => (
-            <Option key={subj} value={subj}>{subj}</Option>
+            <Option key={subj} value={subj}>
+              {subj}
+            </Option>
           ))}
         </Select>
 
         <Suspense fallback={<div>Loading...</div>}>
-
           <SelectButton
             placeholder="Select Exam Type"
             options={examTypes}
@@ -193,8 +191,9 @@ export default function DashBoard() {
 
       {/* Summary Box */}
       <div className="flex flex-col mt-8 max-w-md mx-auto bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
-
-        <h2 className="text-2xl font-semibold mb-4 text-center">📄 Selection Summary</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          📄 Selection Summary
+        </h2>
 
         {[
           ["Department", selectedDept],
@@ -204,7 +203,10 @@ export default function DashBoard() {
           ["Exam Type", selectedExamType],
           ["Year", selectedYear],
         ].map(([label, value]) => (
-          <div key={label} className="flex justify-between border-b border-white/20 pb-1 text-lg">
+          <div
+            key={label}
+            className="flex justify-between border-b border-white/20 pb-1 text-lg"
+          >
             <span>{label}:</span>
             <span className="font-medium">{value || "—"}</span>
           </div>
@@ -237,8 +239,6 @@ export default function DashBoard() {
           ) : null
         )}
       </div>
-
-      <ToastContainer position="top-right" autoClose={2500} />
     </div>
   );
 }

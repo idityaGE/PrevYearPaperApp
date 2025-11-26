@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import PaperCardSkeleton from "./PaperCardSkeleton";
 import { BACKEND_URL } from "../lib/config";
 import { useAuthStore } from "../store/authStore";
@@ -32,9 +32,12 @@ function PendingPapers() {
 
   const fetchPapers = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/admin/pending-papers`,{
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/pending-papers`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
       setPapers(response.data);
     } catch (error) {
       console.error("Error fetching pending papers:", error);
@@ -73,7 +76,9 @@ function PendingPapers() {
             >
               {/* Header */}
               <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                <h4 className="text-xl font-semibold text-white">{p.subject.name}</h4>
+                <h4 className="text-xl font-semibold text-white">
+                  {p.subject.name}
+                </h4>
                 <span className="text-xs px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/40 uppercase">
                   {p.type.replace("_", " ")}
                 </span>
@@ -81,32 +86,51 @@ function PendingPapers() {
 
               {/* Body */}
               <div className="space-y-2 text-sm text-gray-300">
-                <p><span className="font-semibold">Department:</span> {p.subject.semester.program.department.name}</p>
-                <p><span className="font-semibold">Semester:</span> {p.subject.semester.number}</p>
-                <p><span className="font-semibold">Year:</span> {p.year}</p>
-                <p><span className="font-semibold">Subject Code:</span> {p.subject.code}</p>
+                <p>
+                  <span className="font-semibold">Department:</span>{" "}
+                  {p.subject.semester.program.department.name}
+                </p>
+                <p>
+                  <span className="font-semibold">Semester:</span>{" "}
+                  {p.subject.semester.number}
+                </p>
+                <p>
+                  <span className="font-semibold">Year:</span> {p.year}
+                </p>
+                <p>
+                  <span className="font-semibold">Subject Code:</span>{" "}
+                  {p.subject.code}
+                </p>
               </div>
 
               {/* Footer */}
               <div className="mt-6 flex justify-between items-center flex-wrap gap-3">
-                <span className="text-sm italic text-yellow-300">Pending Review</span>
+                <span className="text-sm italic text-yellow-300">
+                  Pending Review
+                </span>
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
                       axios
-                        .put(`${BACKEND_URL}/api/admin/verify-paper/${p.id}`,{},{
-                          headers:{
-                            Authorization:`Bearer ${token}`
+                        .put(
+                          `${BACKEND_URL}/api/admin/verify-paper/${p.id}`,
+                          {},
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
                           }
-                        })
+                        )
                         .then(() => {
                           toast.success("Paper verified successfully!");
-                          setPapers(papers.filter((paper) => paper.id !== p.id));
+                          setPapers(
+                            papers.filter((paper) => paper.id !== p.id)
+                          );
                         })
                         .catch((error) => {
                           console.log(error);
-                          
-                          toast.error("Failed to verify paper.")
+
+                          toast.error("Failed to verify paper.");
                         });
                     }}
                     className="bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg 
