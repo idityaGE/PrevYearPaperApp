@@ -20,7 +20,7 @@ export const teamMembers: TeamMember[] = [
   },
   {
     name: "Aditya Maurya",
-    role: "Founder's Dad",
+    role: "UI/UX Designer",
     links: {
       github: "https://github.com/idityaGE",
       portfolio: "https://iditya.me",
