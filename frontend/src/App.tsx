@@ -124,7 +124,13 @@ function HeaderActions() {
   const { token } = useAuthStore();
   const navigate = useNavigate();
 
-  if (!token) return null;
+  if (!token) {
+    return (
+      <Button variant="default" size="sm" onClick={() => navigate("/signin")}>
+        Login
+      </Button>
+    );
+  }
 
   return (
     <Button

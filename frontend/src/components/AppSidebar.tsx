@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -18,19 +19,25 @@ import {
   Mail,
   LogOut,
   User,
+  LogIn,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import { Button } from "@/components/ui/button";
 
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { token, logout } = useAuthStore();
+  const { setOpenMobile } = useSidebar();
 
   const handleLogout = () => {
     logout();
     navigate("/signin");
+    setOpenMobile(false);
+  };
+
+  const handleNavigation = () => {
+    setOpenMobile(false);
   };
 
   const platformItems = [
@@ -64,6 +71,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <Link
           to="/"
+          onClick={handleNavigation}
           className="flex items-center gap-2 font-bold text-xl text-sidebar-foreground group-data-[collapsible=icon]:justify-center"
         >
           <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shrink-0">
@@ -86,7 +94,7 @@ export function AppSidebar() {
                     isActive={location.pathname === item.url}
                     tooltip={item.title}
                   >
-                    <Link to={item.url}>
+                    <Link to={item.url} onClick={handleNavigation}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -108,7 +116,7 @@ export function AppSidebar() {
                     isActive={location.pathname === item.url}
                     tooltip={item.title}
                   >
-                    <Link to={item.url}>
+                    <Link to={item.url} onClick={handleNavigation}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
@@ -128,7 +136,7 @@ export function AppSidebar() {
                 isActive={location.pathname === "/profile"}
                 tooltip="Profile"
               >
-                <Link to="/profile">
+                <Link to="/profile" onClick={handleNavigation}>
                   <User />
                   <span>Profile</span>
                 </Link>
@@ -146,11 +154,16 @@ export function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         ) : (
-          <div className="group-data-[collapsible=icon]:hidden">
-            <Link to="/signin" className="w-full">
-              <Button className="w-full font-semibold">Login</Button>
-            </Link>
-          </div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Login">
+                <Link to="/signin" onClick={handleNavigation}>
+                  <LogIn />
+                  <span>Login</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         )}
       </SidebarFooter>
       <SidebarRail />
