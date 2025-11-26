@@ -1,65 +1,66 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "../components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "../components/ui/button";
 import {
-  Form, FormControl, FormDescription, FormField,
-  FormItem, FormLabel, FormMessage
-} from "../components/ui/form"
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../components/ui/form";
 import {
-  InputOTP, InputOTPGroup, InputOTPSlot
-} from "../components/ui/input-otp"
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "../components/ui/input-otp";
 
-
-
-
-import axios from "axios"
-import { useAuthStore } from "../store/authStore"
-import { useNavigate, useSearchParams } from "react-router-dom"
-import { BACKEND_URL } from "../lib/config"
+import axios from "axios";
+import { useAuthStore } from "../store/authStore";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { BACKEND_URL } from "../lib/config";
 
 const FormSchema = z.object({
-  pin: z.string().min(6, { message: "Your one-time password must be 6 characters." }),
-})
+  pin: z
+    .string()
+    .min(6, { message: "Your one-time password must be 6 characters." }),
+});
 
 export function InputOTPForm() {
-  const [ searchParams] = useSearchParams();
-  const { signin} = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const { signin } = useAuthStore();
 
-  const userEmail = searchParams.get('email');
+  const userEmail = searchParams.get("email");
 
   const navigate = useNavigate();
-  
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: { pin: "" },
-  })
+  });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const otp: string = data.pin;
-      
-        const res = await axios.post(`${BACKEND_URL}/api/auth/verify-otp`, {
-          email:userEmail,
-          otp
-        });
 
-        if (res.data?.success) {
-          toast.success("✅ OTP verified successfully");
-          // const { token } = useAuthStore();
-          if(!userEmail){
-            throw new Error("Email not found");
-          }
-          signin(res.data.token,userEmail);
+      const res = await axios.post(`${BACKEND_URL}/api/auth/verify-otp`, {
+        email: userEmail,
+        otp,
+      });
 
-        
+      if (res.data?.success) {
+        toast.success("✅ OTP verified successfully");
+        if (!userEmail) {
+          throw new Error("Email not found");
+        }
+        await signin(res.data.token, userEmail);
 
-         // clean store
-        
-         navigate("/");  
+        navigate("/");
       } else {
         toast.error(res.data?.message || "OTP verification failed");
       }
@@ -74,7 +75,7 @@ export function InputOTPForm() {
         <FormField
           control={form.control}
           name="pin"
-          render={({ field }:any) => (
+          render={({ field }: any) => (
             <FormItem>
               <FormLabel>One-Time Password</FormLabel>
               <FormControl>
@@ -86,13 +87,17 @@ export function InputOTPForm() {
                   </InputOTPGroup>
                 </InputOTP>
               </FormControl>
-              <FormDescription>Enter the 6-digit OTP sent to your email.</FormDescription>
+              <FormDescription>
+                Enter the 6-digit OTP sent to your email.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="border bg-black text-white w-full">Verify OTP</Button>
+        <Button type="submit" className="border bg-black text-white w-full">
+          Verify OTP
+        </Button>
       </form>
     </Form>
-  )
+  );
 }

@@ -1,43 +1,33 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import PaperCardSkeleton from "./PaperCardSkeleton";
+import { toast } from "sonner";
 import { BACKEND_URL } from "../lib/config";
 import { useAuthStore } from "../store/authStore";
-
-interface PendingPaper {
-  id: number;
-  type: string;
-  year: number;
-  fileUrl: string;
-  isVerified: boolean;
-  subject: {
-    name: string;
-    code: string;
-    semester: {
-      number: number;
-      program: {
-        department: {
-          name: string;
-        };
-      };
-    };
-  };
-}
+import PaperCard from "./PaperCard";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, Eye, Loader2 } from "lucide-react";
+import type { Paper } from "../types/paper";
 
 function PendingPapers() {
-  const [papers, setPapers] = useState<PendingPaper[]>([]);
+  const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuthStore();
+  const [downloadingIds, setDownloadingIds] = useState<Record<number, boolean>>(
+    {}
+  );
 
   const fetchPapers = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/admin/pending-papers`,{
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
+      const response = await axios.get(
+        `${BACKEND_URL}/api/admin/pending-papers`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
       setPapers(response.data);
     } catch (error) {
       console.error("Error fetching pending papers:", error);
+      toast.error("Failed to fetch pending papers");
     } finally {
       setLoading(false);
     }
@@ -47,88 +37,130 @@ function PendingPapers() {
     fetchPapers();
   }, []);
 
+  const handleDownload = async (e: React.MouseEvent, paper: Paper) => {
+    const url = paper.fileUrl;
+
+    if (url.includes("/raw/")) {
+      e.preventDefault();
+      setDownloadingIds((prev) => ({ ...prev, [paper.id]: true }));
+
+      try {
+        const fileName = url.split("/").pop() || "paper";
+        const finalFileName = fileName.endsWith(".pdf")
+          ? fileName
+          : `${fileName}.pdf`;
+
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = finalFileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href);
+
+        setTimeout(() => {
+          setDownloadingIds((prev) => ({ ...prev, [paper.id]: false }));
+        }, 500);
+      } catch (err) {
+        console.error("Download error:", err);
+        setDownloadingIds((prev) => ({ ...prev, [paper.id]: false }));
+      }
+    }
+  };
+
+  const handleVerify = async (id: number) => {
+    try {
+      await axios.put(
+        `${BACKEND_URL}/api/admin/verify-paper/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Paper verified successfully!");
+      setPapers(papers.filter((paper) => paper.id !== id));
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to verify paper.");
+    }
+  };
+
   return (
-    <div className="px-4 md:px-10 py-10 text-white">
-      <h3 className="text-3xl font-bold mb-8 text-yellow-400 tracking-wide text-center md:text-left">
-        Pending Papers
-      </h3>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">Pending Papers</h2>
+        <div className="text-muted-foreground">
+          {papers.length} {papers.length === 1 ? "paper" : "papers"} pending
+          review
+        </div>
+      </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <PaperCardSkeleton key={i} />
-          ))}
+        <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-border rounded-lg bg-muted/10">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+          <p className="text-lg font-medium text-muted-foreground">
+            Loading papers...
+          </p>
+          <p className="text-sm text-muted-foreground/80 mt-1">
+            Please wait while we load your papers.
+          </p>
         </div>
       ) : papers.length === 0 ? (
-        <p className="text-gray-400 text-center">No pending papers found.</p>
+        <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-border rounded-lg bg-muted/10">
+          <p className="text-lg font-medium text-muted-foreground">
+            No pending papers found
+          </p>
+          <p className="text-sm text-muted-foreground/80 mt-1">
+            All papers have been reviewed or none have been submitted yet.
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {papers.map((p) => (
-            <div
-              key={p.id}
-              className="relative bg-gradient-to-br from-gray-800 via-gray-900 to-black 
-                         border border-white/10 rounded-2xl shadow-xl 
-                         hover:shadow-yellow-500/20 hover:-translate-y-1 transition-all duration-300 
-                         p-6 backdrop-blur-xl"
-            >
-              {/* Header */}
-              <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                <h4 className="text-xl font-semibold text-white">{p.subject.name}</h4>
-                <span className="text-xs px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/40 uppercase">
-                  {p.type.replace("_", " ")}
-                </span>
-              </div>
-
-              {/* Body */}
-              <div className="space-y-2 text-sm text-gray-300">
-                <p><span className="font-semibold">Department:</span> {p.subject.semester.program.department.name}</p>
-                <p><span className="font-semibold">Semester:</span> {p.subject.semester.number}</p>
-                <p><span className="font-semibold">Year:</span> {p.year}</p>
-                <p><span className="font-semibold">Subject Code:</span> {p.subject.code}</p>
-              </div>
-
-              {/* Footer */}
-              <div className="mt-6 flex justify-between items-center flex-wrap gap-3">
-                <span className="text-sm italic text-yellow-300">Pending Review</span>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      axios
-                        .put(`${BACKEND_URL}/api/admin/verify-paper/${p.id}`,{},{
-                          headers:{
-                            Authorization:`Bearer ${token}`
-                          }
-                        })
-                        .then(() => {
-                          toast.success("Paper verified successfully!");
-                          setPapers(papers.filter((paper) => paper.id !== p.id));
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                          
-                          toast.error("Failed to verify paper.")
-                        });
-                    }}
-                    className="bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg 
-                               hover:bg-yellow-400 transition-all duration-200"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {papers.map((paper) => (
+            <PaperCard
+              key={paper.id}
+              paper={paper}
+              showDefaultAction={false}
+              customActions={
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    asChild={!downloadingIds[paper.id]}
+                    disabled={downloadingIds[paper.id]}
                   >
+                    {downloadingIds[paper.id] ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Downloading
+                      </div>
+                    ) : (
+                      <a
+                        href={paper.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => handleDownload(e, paper)}
+                        className="flex items-center gap-2"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </a>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => handleVerify(paper.id)}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
                     Verify
-                  </button>
-
-                  <a
-                    href={p.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-yellow-500 text-black font-semibold px-4 py-2 rounded-lg 
-                               hover:bg-yellow-400 transition-all duration-200"
-                  >
-                    View
-                  </a>
+                  </Button>
                 </div>
-              </div>
-
-              <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-tr from-yellow-500/5 to-transparent blur-xl"></div>
-            </div>
+              }
+            />
           ))}
         </div>
       )}

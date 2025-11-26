@@ -1,18 +1,16 @@
-import { CssVarsProvider } from '@mui/joy/styles';
-import Sheet from '@mui/joy/Sheet';
-import CssBaseline from '@mui/joy/CssBaseline';
-import Typography from '@mui/joy/Typography';
+import { CssVarsProvider } from "@mui/joy/styles";
+import Sheet from "@mui/joy/Sheet";
+import CssBaseline from "@mui/joy/CssBaseline";
+import Typography from "@mui/joy/Typography";
 
-import Link from '@mui/joy/Link';
-
-import InputBox from './InputBox';
-import CustomButton from './CustomButton';
-import { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import ToastContainerComponent from './ToastContainerComponent';
-import { BACKEND_URL } from '../lib/config';
+import Link from "@mui/joy/Link";
+import { toast } from "sonner";
+import InputBox from "./InputBox";
+import CustomButton from "./CustomButton";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../lib/config";
 
 // function ModeToggle() {
 //   const { mode, setMode } = useColorScheme();
@@ -45,8 +43,8 @@ import { BACKEND_URL } from '../lib/config';
 
 export default function Signin(/*props*/) {
   const navigate = useNavigate();
-  const [email,setEmail] = useState("");
-  const [ password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <main>
@@ -55,30 +53,27 @@ export default function Signin(/*props*/) {
         <CssBaseline />
         {/* <div className="h-screen w-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 flex justify-center items-center"> */}
 
-    <Sheet
-      sx={{
-        width: "100%",
-        maxWidth: 380,
-        mx: "auto",
-        my: 4,
-        py: 3,
-        px: { xs: 2, sm: 3 },
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        borderRadius: "16px",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-        color: "white",
-        background:
-          "linear-gradient(135deg, rgba(186,186,186,0.6), rgba(99, 106, 125,0.9))",
-        backdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.2)",
-      }}
-      variant="outlined"
-    >
-
-
-
+        <Sheet
+          sx={{
+            width: "100%",
+            maxWidth: 380,
+            mx: "auto",
+            my: 4,
+            py: 3,
+            px: { xs: 2, sm: 3 },
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            borderRadius: "16px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+            color: "white",
+            background:
+              "linear-gradient(135deg, rgba(186,186,186,0.6), rgba(99, 106, 125,0.9))",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.2)",
+          }}
+          variant="outlined"
+        >
           <div>
             <Typography level="h4" component="h1">
               <b>Welcome!</b>
@@ -86,41 +81,55 @@ export default function Signin(/*props*/) {
             <Typography level="body-sm">Sign in to continue.</Typography>
           </div>
 
-
-          <InputBox name="Email" type="Email" onChange={(e:React.ChangeEvent<HTMLInputElement>)=>setEmail(e.target.value)} placeholder="johndoe@email.com" />
+          <InputBox
+            name="Email"
+            type="Email"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
+            placeholder="johndoe@email.com"
+          />
           {/* <InputBox name="username" type="username" placeholder="john doe" /> */}
-          <InputBox name="password" type="password" onChange={(e:React.ChangeEvent<HTMLInputElement>)=>setPassword(e.target.value)} placeholder="password" />
-          
-        <CustomButton text="Sign up" onClick={async() => {
-          const response = await axios.post(`${BACKEND_URL}/api/auth/signin`,{
-            email,
-            password
-          })
+          <InputBox
+            name="password"
+            type="password"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
+            placeholder="password"
+          />
 
-          if(!response.data.token){
-            toast.error("Error Whiling sign in");
-            return;
-          }
-          localStorage.setItem("token", response.data.token);
-          toast.success("Signup successful!");
+          <CustomButton
+            text="Sign up"
+            onClick={async () => {
+              const response = await axios.post(
+                `${BACKEND_URL}/api/auth/signin`,
+                {
+                  email,
+                  password,
+                }
+              );
 
-          
-          navigate('/dashboard')
-          //verify the token
-          //
-        }} />
+              if (!response.data.token) {
+                toast.error("Error Whiling sign in");
+                return;
+              }
+              localStorage.setItem("token", response.data.token);
+              toast.success("Signup successful!");
+
+              navigate("/dashboard");
+              //verify the token
+              //
+            }}
+          />
           <Typography
             endDecorator={<Link href="/signup">Sign up</Link>}
-            sx={{ fontSize: 'sm', alignSelf: 'center' }}
+            sx={{ fontSize: "sm", alignSelf: "center" }}
           >
             Don&apos;t have an account?
           </Typography>
         </Sheet>
-        <ToastContainerComponent/>
-        {/* </div> */}
       </CssVarsProvider>
     </main>
   );
 }
-
-

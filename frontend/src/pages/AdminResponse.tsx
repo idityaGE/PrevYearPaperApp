@@ -1,7 +1,7 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import { MessageSquare, Send } from "lucide-react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useAuthStore } from "../store/authStore";
 import { BACKEND_URL } from "../lib/config";
 
@@ -49,11 +49,10 @@ const AdminResponse: React.FC = () => {
     };
 
     fetchQueries();
-  }, []);
+  }, [token]);
 
   // ✅ Handle send response
   const handleSendResponse = async (queryId: number, responseText: string) => {
-    const { token } = useAuthStore();
     try {
       if (!responseText.trim()) return;
 
@@ -68,10 +67,12 @@ const AdminResponse: React.FC = () => {
       );
 
       const updatedQueries = allQueries.map((q) =>
-        q.id === queryId ? { ...q, isResponded: true, response: responseText } : q
+        q.id === queryId
+          ? { ...q, isResponded: true, response: responseText }
+          : q
       );
       setAllQueries(updatedQueries);
-        toast.success("Response sent successfully");
+      toast.success("Response sent successfully");
     } catch (err) {
       console.error(err);
       toast.error("Failed to send response");
@@ -79,7 +80,10 @@ const AdminResponse: React.FC = () => {
   };
 
   // ✅ Handle textarea change safely
-  const handleResponseChange = (e: ChangeEvent<HTMLTextAreaElement>, queryId: number) => {
+  const handleResponseChange = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    queryId: number
+  ) => {
     const updatedQueries = allQueries.map((q) =>
       q.id === queryId ? { ...q, response: e.target.value } : q
     );
