@@ -42,7 +42,7 @@ function PendingQueries() {
                          hover:border-yellow-400 transition-all duration-300"
             >
               <div className="flex flex-wrap justify-between items-center mb-3 gap-2">
-                <h4 className="text-lg font-medium break-words">
+                <h4 className="text-lg font-medium">
                   Email: <span className="text-yellow-300">{q.user.email}</span>
                 </h4>
                 <span

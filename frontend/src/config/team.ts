@@ -14,12 +14,20 @@ export const teamMembers: TeamMember[] = [
     name: "Pradeep Kumar",
     role: "Founder & Engineer",
     links: {
-      github: "https://github.com/pradeepkumar",
-      linkedin: "https://linkedin.com/in/pradeepkumar",
-      portfolio: "https://pradeepkumar.dev",
+      github: "https://github.com/Pradeeprajpoot434680",
+      linkedin: "https://www.linkedin.com/in/pradeep-kumar-25798b2a0",
     },
   },
-  // Add more team members here
+  {
+    name: "Aditya Maurya",
+    role: "Founder's Dad",
+    links: {
+      github: "https://github.com/idityaGE",
+      portfolio: "https://iditya.me",
+      twitter: "https://x.com/idityage",
+      linkedin: "https://www.linkedin.com/in/idityage",
+    },
+  },
 ];
 
 export const contactInfo = {
