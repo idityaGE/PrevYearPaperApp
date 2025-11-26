@@ -151,7 +151,7 @@ function PendingPapers() {
                 </div>
               </div>
 
-              <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-tr from-yellow-500/5 to-transparent blur-xl"></div>
+              <div className="absolute inset-0 rounded-2xl pointer-events-none from-yellow-500/5 to-transparent blur-xl"></div>
             </div>
           ))}
         </div>

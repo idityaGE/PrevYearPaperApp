@@ -10,9 +10,24 @@ interface AuthState {
   checkAdmin: (email: string) => Promise<void>;
 }
 
+// Initialize from localStorage
+const getInitialToken = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("token");
+  }
+  return null;
+};
+
+const getInitialEmail = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("email");
+  }
+  return null;
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
-  email: null,
-  token: null,
+  email: getInitialEmail(),
+  token: getInitialToken(),
   admin: false,
 
   logout: () => {
@@ -29,7 +44,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkAdmin: async (email: string) => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/admin/getUserType?email=${email}`);
+      const res = await axios.get(
+        `http://localhost:3000/api/admin/getUserType?email=${email}`
+      );
 
       set({ admin: res.data.isAdmin === true });
     } catch (error) {

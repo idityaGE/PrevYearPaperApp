@@ -1,25 +1,46 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthStore } from "../store/authStore";
 import { BACKEND_URL } from "../lib/config";
-
-const InputForProfile = lazy(() => import("../components/InputForProfile"));
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { User, Mail, Twitter, Linkedin, Camera, Loader2 } from "lucide-react";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  // const {email} = useAuthStore();
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
   const [bio, setBio] = useState("");
   const [twitterHandle, setTwitterHandle] = useState("");
   const [linkedinProfile, setLinkedinProfile] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetchingProfile, setFetchingProfile] = useState(true);
+
+  const [originalValues, setOriginalValues] = useState({
+    profilePic: null as string | null,
+    name: "",
+    bio: "",
+    twitterHandle: "",
+    linkedinProfile: "",
+  });
 
   const { token } = useAuthStore();
+
   const fetchUserInfo = async () => {
     if (!token || token.length < 20) {
       navigate("/signin");
@@ -27,20 +48,35 @@ const ProfilePage = () => {
     }
 
     try {
+      setFetchingProfile(true);
       const response = await axios.get(`${BACKEND_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = response.data;
-      setName(data.name || "");
+      const fetchedData = {
+        profilePic: data.profilePicUrl || "",
+        name: data.name || "",
+        bio: data.bio || "",
+        twitterHandle: data.twitter || "",
+        linkedinProfile: data.linkedIn || "",
+      };
+
+      setName(fetchedData.name);
       setEmail(data.email || "");
-      setBio(data.bio || "");
-      setProfilePic(data.profilePicUrl || "");
-      setTwitterHandle(data.twitter || "");
-      setLinkedinProfile(data.linkedIn || "");
+      setBio(fetchedData.bio);
+      setProfilePic(fetchedData.profilePic);
+      setTwitterHandle(fetchedData.twitterHandle);
+      setLinkedinProfile(fetchedData.linkedinProfile);
+
+      // Store original values
+      setOriginalValues(fetchedData);
     } catch (error) {
       console.error("Error fetching user info:", error);
+      toast.error("Failed to load profile");
       navigate("/signin");
+    } finally {
+      setFetchingProfile(false);
     }
   };
 
@@ -58,7 +94,15 @@ const ProfilePage = () => {
     }
   };
 
-  const toggleEditMode = () => setIsEditing(!isEditing);
+  const handleCancel = () => {
+    // Reset to original values without fetching
+    setProfilePic(originalValues.profilePic);
+    setName(originalValues.name);
+    setBio(originalValues.bio);
+    setTwitterHandle(originalValues.twitterHandle);
+    setLinkedinProfile(originalValues.linkedinProfile);
+    setIsEditing(false);
+  };
 
   const handleSaveChanges = async () => {
     if (!token || token.length < 20) {
@@ -67,6 +111,7 @@ const ProfilePage = () => {
     }
 
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("name", name);
       formData.append("bio", bio);
@@ -87,146 +132,215 @@ const ProfilePage = () => {
 
       toast.success("Profile updated successfully!");
       setIsEditing(false);
+      // Fetch fresh data after successful save
       fetchUserInfo();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  if (fetchingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-black min-h-screen w-full flex justify-center items-center py-16 px-4">
-      <div className="w-full max-w-3xl bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-6 sm:p-10 text-white transition-all duration-300 hover:scale-[1.01]">
-        {/* Profile Picture Section */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative">
-            <img
-              src={profilePic || "/user.jpeg"}
-              alt="Profile"
-              className="w-32 h-32 sm:w-36 sm:h-36 rounded-full object-cover shadow-lg border-4 border-white/30"
-            />
-            {isEditing && (
-              <>
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      {/* Header Card */}
+      <Card>
+        <CardHeader className="text-center pb-4">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={profilePic || undefined} alt={name} />
+                <AvatarFallback className="text-2xl">
+                  {name ? getInitials(name) : <User className="h-12 w-12" />}
+                </AvatarFallback>
+              </Avatar>
+              {isEditing && (
                 <label
                   htmlFor="profile-pic-upload"
-                  className="absolute bottom-0 right-0 bg-pink-500 hover:bg-pink-600 text-white rounded-full w-10 h-10 flex justify-center items-center text-xl cursor-pointer transition"
+                  className="absolute bottom-0 right-0 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-2 cursor-pointer transition-colors shadow-lg"
                   title="Upload Picture"
                 >
-                  +
+                  <Camera className="h-4 w-4" />
+                  <input
+                    type="file"
+                    id="profile-pic-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleProfilePicChange}
+                  />
                 </label>
-                <input
-                  type="file"
-                  id="profile-pic-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleProfilePicChange}
-                />
-              </>
+              )}
+            </div>
+            <div className="space-y-1">
+              <CardTitle className="text-2xl">
+                {name || "User Profile"}
+              </CardTitle>
+              <CardDescription className="flex items-center justify-center gap-2">
+                <Mail className="h-4 w-4" />
+                {email}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Profile Information Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>
+                {isEditing
+                  ? "Update your profile details"
+                  : "View your profile details"}
+              </CardDescription>
+            </div>
+            {!isEditing && (
+              <Button onClick={() => setIsEditing(true)} disabled={loading}>
+                Edit Profile
+              </Button>
             )}
           </div>
-          <h2 className="text-3xl font-extrabold mt-4 bg-gradient-to-r from-pink-400 to-orange-500 bg-clip-text text-transparent">
-            {name || "User Profile"}
-          </h2>
-          <p className="text-gray-300 text-sm mt-1">{email}</p>
-        </div>
-
-        {/* Profile Info Section */}
-        <div className="space-y-6">
-          {/* Name */}
-          <div>
-            <label className="text-sm text-gray-300">Name</label>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="name" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Name
+            </Label>
             {isEditing ? (
-              <Suspense fallback={<div>Loading...</div>}>
-                <InputForProfile
-                  value={name}
-                  placeholder="Change Name"
-                  onChange={(e: any) => setName(e.target.value)}
-                />
-              </Suspense>
-            ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1">
-                {name}
-              </p>
-            )}
-          </div>
-
-          {/* Bio */}
-          <div>
-            <label className="text-sm text-gray-300">Bio</label>
-            {isEditing ? (
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={3}
-                placeholder="Tell us about yourself"
-                className="w-full mt-1 p-3 rounded-lg bg-white/5 border border-white/20 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                disabled={loading}
               />
             ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-                {bio && bio.trim() !== "" ? bio : "No bio available"}
+              <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
+                {name || "Not provided"}
               </p>
             )}
           </div>
 
-          {/* Socials */}
-          <div>
-            <label className="text-sm text-gray-300">Twitter</label>
+          <Separator />
+
+          {/* Bio Field */}
+          <div className="space-y-2">
+            <Label htmlFor="bio">Bio</Label>
             {isEditing ? (
-              <Suspense fallback={<div>Loading...</div>}>
-                <InputForProfile
+              <Textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell us about yourself"
+                rows={4}
+                disabled={loading}
+                className="resize-none"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md min-h-[100px]">
+                {bio || "No bio available"}
+              </p>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Social Links */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Social Links</h3>
+
+            {/* Twitter */}
+            <div className="space-y-2">
+              <Label htmlFor="twitter" className="flex items-center gap-2">
+                <Twitter className="h-4 w-4" />
+                Twitter
+              </Label>
+              {isEditing ? (
+                <Input
+                  id="twitter"
                   value={twitterHandle}
-                  onChange={(e: any) => setTwitterHandle(e.target.value)}
-                  placeholder="Twitter handle"
+                  onChange={(e) => setTwitterHandle(e.target.value)}
+                  placeholder="@username"
+                  disabled={loading}
                 />
-              </Suspense>
-            ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-                {twitterHandle && twitterHandle.trim() !== ""
-                  ? twitterHandle
-                  : "No bio available"}
-              </p>
-            )}
+              ) : (
+                <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
+                  {twitterHandle || "Not provided"}
+                </p>
+              )}
+            </div>
 
-            <label className="text-sm text-gray-300 mt-4 block">LinkedIn</label>
-            {isEditing ? (
-              <Suspense fallback={<div>Loading...</div>}>
-                <InputForProfile
+            {/* LinkedIn */}
+            <div className="space-y-2">
+              <Label htmlFor="linkedin" className="flex items-center gap-2">
+                <Linkedin className="h-4 w-4" />
+                LinkedIn
+              </Label>
+              {isEditing ? (
+                <Input
+                  id="linkedin"
                   value={linkedinProfile}
-                  onChange={(e: any) => setLinkedinProfile(e.target.value)}
-                  placeholder="LinkedIn profile"
+                  onChange={(e) => setLinkedinProfile(e.target.value)}
+                  placeholder="linkedin.com/in/username"
+                  disabled={loading}
                 />
-              </Suspense>
-            ) : (
-              <p className="bg-white/5 border border-white/20 p-3 rounded-lg mt-1 text-white/70">
-                {linkedinProfile && linkedinProfile.trim() !== ""
-                  ? linkedinProfile
-                  : "No bio available"}
-              </p>
-            )}
+              ) : (
+                <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
+                  {linkedinProfile || "Not provided"}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Buttons */}
-        <div className="text-center mt-10">
-          {isEditing ? (
-            <button
-              type="button"
-              onClick={handleSaveChanges}
-              className="px-6 py-3 bg-gradient-to-r from-green-400 to-emerald-600 text-white font-semibold rounded-full shadow-md hover:shadow-green-400/40 transition"
-            >
-              Save Changes
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={toggleEditMode}
-              className="px-6 py-3 bg-gradient-to-r from-pink-400 to-orange-600 text-white font-semibold rounded-full shadow-md hover:shadow-pink-500/40 transition"
-            >
-              Edit Profile
-            </button>
+          {/* Save Button */}
+          {isEditing && (
+            <>
+              <Separator />
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveChanges} disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </div>
+            </>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

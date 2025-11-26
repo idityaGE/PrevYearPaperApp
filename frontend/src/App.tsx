@@ -5,6 +5,7 @@ import {
   useLocation,
   useParams,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import DashBoard from "./pages/DashBoard";
 import Contact from "./pages/Contact";
@@ -15,7 +16,6 @@ import ProfilePage from "./pages/ProfilePage";
 import OtpVerification from "./pages/OtpVerification";
 import SendMail from "./pages/SendMail";
 import AuthPage from "./pages/AuthPage";
-import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import ProtectedRoute from "./components/ProtectedRoute";
 import {
@@ -34,19 +34,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
+import { FilePlus } from "lucide-react";
 
 function App() {
-  const { signin } = useAuthStore();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const email = localStorage.getItem("email");
-
-    if (token && email) {
-      signin(token, email);
-    }
-  }, [signin]);
-
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
@@ -57,9 +49,9 @@ function App() {
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
+                <Breadcrumb className="hidden md:block">
                   <BreadcrumbList>
-                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       <BreadcrumbPage>
                         <PageTitle />
@@ -68,7 +60,10 @@ function App() {
                   </BreadcrumbList>
                 </Breadcrumb>
               </div>
-              <ModeToggle />
+              <div className="flex items-center gap-2">
+                <HeaderActions />
+                <ModeToggle />
+              </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 bg-background">
@@ -125,6 +120,24 @@ function App() {
   );
 }
 
+function HeaderActions() {
+  const { token } = useAuthStore();
+  const navigate = useNavigate();
+
+  if (!token) return null;
+
+  return (
+    <Button
+      variant="default"
+      onClick={() => navigate("/add-paper")}
+      className="flex cursor-pointer"
+    >
+      <FilePlus className="h-4 w-4 mr-2" />
+      Add Paper
+    </Button>
+  );
+}
+
 function PageTitle() {
   const location = useLocation();
   const path = location.pathname;
@@ -153,6 +166,15 @@ function PageTitle() {
 
 function AuthPageWrapper() {
   const { authType } = useParams();
+  const { token } = useAuthStore();
+  const location = useLocation();
+
+  if (token) {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get("redirect");
+    return <Navigate to={redirect || "/"} replace />;
+  }
+
   if (authType === "signin" || authType === "signup") {
     return <AuthPage />;
   }
