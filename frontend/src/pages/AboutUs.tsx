@@ -29,7 +29,7 @@ export default function AboutUs() {
       </div>
 
       {/* Mission */}
-      <div className="space-y-3 border-l-2 border-border pl-6">
+      <div className="space-y-3 border-l-2 border-border py-2 px-6">
         <h2 className="text-xl font-semibold">Mission</h2>
         <p className="text-muted-foreground leading-relaxed">
           Empower students with fast, organized, and verified exam resources to
@@ -38,7 +38,7 @@ export default function AboutUs() {
       </div>
 
       {/* Philosophy */}
-      <div className="space-y-3 border-l-2 border-border pl-6">
+      <div className="space-y-3 border-l-2 border-border py-2 px-6">
         <h2 className="text-xl font-semibold">Philosophy</h2>
         <p className="text-muted-foreground leading-relaxed">
           Simplicity • Speed • Organized content

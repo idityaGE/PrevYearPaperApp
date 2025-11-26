@@ -16,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 
 export default function AddPaper() {
   const { token } = useAuthStore();
@@ -172,7 +172,7 @@ export default function AddPaper() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-10 px-4 md:px-6">
+    <div className="w-full max-w-5xl mx-auto py-10 px-4">
       <div className="flex flex-col gap-8">
         {/* Header Section */}
         <div className="flex flex-col gap-2">
@@ -192,166 +192,168 @@ export default function AddPaper() {
 
         <Separator />
 
-        {/* Form Section */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Department</Label>
-            <Select
-              onValueChange={(val) => {
-                setSelectedDept(val);
-                setSelectedProgram("");
-                setSelectedSemester(null);
-                setSelectedSubject("");
-              }}
-            >
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Department" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="bg-background py-6 px-4">
+          {/* Form Section */}
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Department</Label>
+              <Select
+                onValueChange={(val) => {
+                  setSelectedDept(val);
+                  setSelectedProgram("");
+                  setSelectedSemester(null);
+                  setSelectedSubject("");
+                }}
+              >
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Program</Label>
+              <Select
+                disabled={!selectedDept}
+                onValueChange={(val) => {
+                  setSelectedProgram(val);
+                  setSelectedSemester(null);
+                  setSelectedSubject("");
+                }}
+              >
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Program" />
+                </SelectTrigger>
+                <SelectContent>
+                  {programs.map((prog) => (
+                    <SelectItem key={prog.name} value={prog.name}>
+                      {prog.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Semester</Label>
+              <Select
+                disabled={!selectedProgram}
+                onValueChange={(val) => setSelectedSemester(Number(val))}
+              >
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  {semesters.map((s) => (
+                    <SelectItem key={s.number} value={String(s.number)}>
+                      Semester {s.number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Subject</Label>
+              <Select
+                disabled={!selectedSemester}
+                onValueChange={(val) => setSelectedSubject(val)}
+              >
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjects.map((subj) => (
+                    <SelectItem key={subj} value={subj}>
+                      {subj}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Exam Type</Label>
+              <Select onValueChange={(val) => setSelectedExamType(val)}>
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Exam Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {examTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Year</Label>
+              <Select onValueChange={(val) => setSelectedYear(Number(val))}>
+                <SelectTrigger className="h-12 text-base w-full">
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Program</Label>
-            <Select
-              disabled={!selectedDept}
-              onValueChange={(val) => {
-                setSelectedProgram(val);
-                setSelectedSemester(null);
-                setSelectedSubject("");
-              }}
-            >
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Program" />
-              </SelectTrigger>
-              <SelectContent>
-                {programs.map((prog) => (
-                  <SelectItem key={prog.name} value={prog.name}>
-                    {prog.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Semester</Label>
-            <Select
-              disabled={!selectedProgram}
-              onValueChange={(val) => setSelectedSemester(Number(val))}
-            >
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Semester" />
-              </SelectTrigger>
-              <SelectContent>
-                {semesters.map((s) => (
-                  <SelectItem key={s.number} value={String(s.number)}>
-                    Semester {s.number}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Subject</Label>
-            <Select
-              disabled={!selectedSemester}
-              onValueChange={(val) => setSelectedSubject(val)}
-            >
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Subject" />
-              </SelectTrigger>
-              <SelectContent>
-                {subjects.map((subj) => (
-                  <SelectItem key={subj} value={subj}>
-                    {subj}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Exam Type</Label>
-            <Select onValueChange={(val) => setSelectedExamType(val)}>
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Exam Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {examTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-base font-medium">Year</Label>
-            <Select onValueChange={(val) => setSelectedYear(Number(val))}>
-              <SelectTrigger className="h-12 text-base w-full">
-                <SelectValue placeholder="Select Year" />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={String(year)}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <Label className="text-base font-medium">Upload File</Label>
-          <div className="border-2 border-dashed rounded-xl p-10 text-center hover:bg-muted/50 transition-colors cursor-pointer relative group">
-            <Input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFileChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            />
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 bg-background rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                <UploadCloud className="h-8 w-8 text-primary" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-lg font-medium">
-                  {file ? file.name : "Click to upload or drag and drop"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  PDF, JPG or PNG (max. 5MB)
-                </p>
+          <div className="space-y-4">
+            <Label className="text-base font-medium">Upload File</Label>
+            <div className="border-2 border-dashed rounded-xl p-10 text-center hover:bg-muted/50 transition-colors cursor-pointer relative group">
+              <Input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-4 bg-background rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                  <UploadCloud className="h-8 w-8 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-lg font-medium">
+                    {file ? file.name : "Click to upload or drag and drop"}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    PDF, JPG or PNG (max. 5MB)
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex justify-end pt-4">
-          <Button
-            onClick={handleSubmit}
-            size="lg"
-            disabled={loading}
-            className="w-full md:w-auto min-w-[200px] h-12 text-base"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              "Submit Paper"
-            )}
-          </Button>
+          <div className="flex justify-end pt-4">
+            <Button
+              onClick={handleSubmit}
+              size="lg"
+              disabled={loading}
+              className="w-full md:w-auto min-w-[200px] h-12 text-base"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                "Submit Paper"
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
